@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{shared/fragments :: head(${editMode ? 'Cập nhật Chuyến xe - Admin' : 'Thêm Chuyến xe Mới - Admin'})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{shared/fragments :: navbar}"></nav>
+
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <div class="col-lg-2 px-0">
+            <aside th:replace="~{shared/fragments :: adminSidebar(${activeMenu})}"></aside>
+        </div>
+
+        <main class="col-lg-10 py-4 px-4">
+            <div th:replace="~{shared/fragments :: alerts}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">
+                        <i class="bi text-primary me-2" th:classappend="${editMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'}"></i>
+                        <span th:text="${editMode ? 'Cập nhật Thông tin Chuyến xe' : 'Tạo Chuyến xe Mới &amp; Tự động Sinh Sơ đồ Ghế'}">Tạo Chuyến xe Mới</span>
+                    </h3>
+                    <p class="text-muted mb-0">Khi tạo chuyến xe mới, hệ thống tự động tạo đầy đủ danh sách ghế theo cấu hình 36, 40 hoặc 45 chỗ</p>
+                </div>
+                <a th:href="@{/admin/trips}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
+                </a>
+            </div>
+
+            <div class="admin-section-card p-4">
+                <form th:action="@{/admin/trips/save}" th:object="${tripForm}" method="post">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nhà xe vận hành <span class="text-danger">*</span></label>
+                            <select th:field="*{companyId}" class="form-select" required>
+                                <option value="">-- Chọn nhà xe --</option>
+                                <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name + ' (' + c.hotline + ')'}"></option>
+                            </select>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('companyId')}" th:errors="*{companyId}"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Loại xe &amp; Sơ đồ ghế <span class="text-danger">*</span></label>
+                            <select th:field="*{busType}" class="form-select" required>
+                                <option th:each="bt : ${busTypes}" th:value="${bt}" th:text="${bt.displayName}"></option>
+                            </select>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('busType')}" th:errors="*{busType}"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Biển số xe <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{licensePlate}" class="form-control" placeholder="VD: 29B-123.45" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('licensePlate')}" th:errors="*{licensePlate}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tỉnh / Thành phố đi <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{departureProvince}" class="form-control" placeholder="VD: Hà Nội" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('departureProvince')}" th:errors="*{departureProvince}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tỉnh / Thành phố đến <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{arrivalProvince}" class="form-control" placeholder="VD: Đà Nẵng" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('arrivalProvince')}" th:errors="*{arrivalProvince}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Bến xe / Điểm đón <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{departureStation}" class="form-control" placeholder="VD: Bến xe Mỹ Đình" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('departureStation')}" th:errors="*{departureStation}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Bến xe / Điểm trả <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{arrivalStation}" class="form-control" placeholder="VD: Bến xe Trung tâm Đà Nẵng" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('arrivalStation')}" th:errors="*{arrivalStation}"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Giờ khởi hành <span class="text-danger">*</span></label>
+                            <input type="datetime-local" th:field="*{departureTime}" class="form-control" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('departureTime')}" th:errors="*{departureTime}"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Giờ dự kiến đến <span class="text-danger">*</span></label>
+                            <input type="datetime-local" th:field="*{arrivalTime}" class="form-control" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('arrivalTime')}" th:errors="*{arrivalTime}"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Giá vé niêm yết (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" step="5000" min="10000" th:field="*{ticketPrice}" class="form-control" placeholder="350000" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('ticketPrice')}" th:errors="*{ticketPrice}"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Trạng thái chuyến</label>
+                            <select th:field="*{status}" class="form-select">
+                                <option th:each="s : ${tripStatuses}" th:value="${s}" th:text="${s.displayName}"></option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Tiện ích &amp; Ghi chú chuyến xe</label>
+                            <textarea th:field="*{amenities}" class="form-control" rows="2" placeholder="Wifi tốc độ cao, Nước suối, Khăn lạnh, Cổng sạc USB..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a th:href="@{/admin/trips}" class="btn btn-outline-secondary">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            <span th:text="${editMode ? 'Cập nhật Chuyến xe' : 'Tạo Chuyến xe &amp; Sinh Sơ đồ Ghế'}">Lưu chuyến xe</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="~{shared/fragments :: footer}"></footer>
+<div th:replace="~{shared/fragments :: scripts('/js/module_1/trip-form.js')}"></div>
+</body>
+</html>

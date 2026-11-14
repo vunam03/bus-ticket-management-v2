@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="spSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="55%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <linearGradient id="spHill1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+    <linearGradient id="spHill2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#166534"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#spSky)"/>
+  <circle cx="620" cy="115" r="46" fill="#fef08a"/>
+  <circle cx="620" cy="115" r="78" fill="#fef08a" opacity="0.28"/>
+  <!-- Fansipan Peaks -->
+  <polygon points="0,280 150,120 310,255 460,105 640,240 800,155 800,320 0,320" fill="#1e3a8a" opacity="0.72"/>
+  <polygon points="80,290 250,145 430,270 590,140 800,265 800,330 80,330" fill="#0f766e" opacity="0.82"/>
+  <!-- Floating Valley Clouds -->
+  <g fill="#ffffff" opacity="0.72">
+    <ellipse cx="180" cy="220" rx="95" ry="18"/>
+    <ellipse cx="235" cy="215" rx="65" ry="16"/>
+    <ellipse cx="520" cy="195" rx="115" ry="20"/>
+    <ellipse cx="585" cy="190" rx="70" ry="15"/>
+  </g>
+  <!-- Cable car line -->
+  <line x1="80" y1="245" x2="660" y2="125" stroke="#0f172a" stroke-width="2" opacity="0.6"/>
+  <g transform="translate(360,180)">
+    <line x1="14" y1="-2" x2="14" y2="10" stroke="#0f172a" stroke-width="2"/>
+    <rect x="0" y="10" width="28" height="18" rx="5" fill="#dc2626"/>
+    <rect x="4" y="13" width="20" height="7" rx="2" fill="#e0f2fe"/>
+  </g>
+  <!-- Cascading Golden Rice Terraces -->
+  <path d="M0,305 Q220,255 470,325 T800,295 L800,500 L0,500 Z" fill="url(#spHill1)"/>
+  <path d="M0,340 Q210,290 450,355 T800,330 L800,500 L0,500 Z" fill="#65a30d"/>
+  <path d="M0,375 Q200,325 440,390 T800,365 L800,500 L0,500 Z" fill="#eab308"/>
+  <path d="M0,410 Q230,360 470,425 T800,398 L800,500 L0,500 Z" fill="#15803d"/>
+  <path d="M0,448 Q260,400 500,460 T800,435 L800,500 L0,500 Z" fill="url(#spHill2)"/>
+  <path d="M0,478 Q280,445 550,488 T800,470 L800,500 L0,500 Z" fill="#14532d"/>
+</svg>

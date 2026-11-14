@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="dfSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#5eead4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#dfSky)"/>
+  <circle cx="640" cy="120" r="45" fill="#fef08a"/>
+  <path d="M0,295 Q180,180 390,260 T800,235 L800,375 L0,375 Z" fill="#134e4a" opacity="0.78"/>
+  <path d="M0,335 Q240,260 520,330 T800,295 L800,500 L0,500 Z" fill="#0d9488"/>
+  <!-- Highway -->
+  <path d="M0,455 Q340,360 800,425 L800,500 L0,500 Z" fill="#1e293b"/>
+  <path d="M40,468 Q350,395 760,455" fill="none" stroke="#facc15" stroke-width="5" stroke-dasharray="28 18"/>
+  <!-- Stylized Luxury Coach -->
+  <g transform="translate(315,340)">
+    <rect x="0" y="10" width="185" height="68" rx="14" fill="#ffffff"/>
+    <rect x="0" y="54" width="185" height="14" fill="#0d9488"/>
+    <rect x="14" y="20" width="38" height="24" rx="4" fill="#0f172a"/>
+    <rect x="58" y="20" width="36" height="24" rx="4" fill="#0f172a"/>
+    <rect x="100" y="20" width="36" height="24" rx="4" fill="#0f172a"/>
+    <rect x="142" y="20" width="32" height="24" rx="4" fill="#0f172a"/>
+    <circle cx="42" cy="78" r="14" fill="#0f172a"/>
+    <circle cx="42" cy="78" r="6" fill="#cbd5e1"/>
+    <circle cx="145" cy="78" r="14" fill="#0f172a"/>
+    <circle cx="145" cy="78" r="6" fill="#cbd5e1"/>
+  </g>
+</svg>

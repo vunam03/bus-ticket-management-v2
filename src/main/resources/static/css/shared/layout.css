@@ -1,0 +1,75 @@
+:root {
+    --primary-color: #0f766e;
+    --primary-dark: #115e59;
+    --accent-color: #f59e0b;
+    --navy-dark: #0f172a;
+    --slate-bg: #f8fafc;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--slate-bg);
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-brand-custom {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    font-size: 1.35rem;
+}
+
+.admin-layout-wrapper {
+    display: flex;
+    min-height: calc(100vh - 64px);
+}
+
+.admin-sidebar {
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
+    flex-shrink: 0;
+    padding: 1.25rem 0.85rem;
+}
+
+.admin-sidebar .nav-link {
+    color: #cbd5e1;
+    border-radius: 10px;
+    padding: 0.68rem 1rem;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    background-color: rgba(20, 184, 166, 0.2);
+    color: #5eead4;
+    font-weight: 600;
+}
+
+.admin-content-area {
+    flex-grow: 1;
+    padding: 1.75rem 2rem;
+    overflow-x: hidden;
+}
+
+.card-modern {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+footer.site-footer {
+    margin-top: auto;
+    background-color: #0f172a;
+    color: #94a3b8;
+}

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="hpSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="55%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#fef9c3"/>
+    </linearGradient>
+    <linearGradient id="hpSea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d9488"/>
+      <stop offset="65%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#134e4a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#hpSky)"/>
+  <circle cx="580" cy="110" r="42" fill="#fef08a"/>
+  <!-- Lan Ha / Cat Ba Limestone Karsts -->
+  <path d="M50,285 L95,165 L145,195 L180,145 L245,285 Z" fill="#134e4a" opacity="0.72"/>
+  <path d="M275,285 L315,180 L365,205 L405,155 L465,285 Z" fill="#115e59" opacity="0.82"/>
+  <path d="M510,285 L560,150 L620,185 L680,135 L760,285 Z" fill="#0f766e" opacity="0.88"/>
+  <!-- Sea -->
+  <rect x="0" y="280" width="800" height="220" fill="url(#hpSea)"/>
+  <!-- Cruise Boat -->
+  <g transform="translate(360,305)">
+    <path d="M0,32 L145,32 L128,54 L14,54 Z" fill="#ffffff"/>
+    <rect x="26" y="14" width="90" height="18" rx="3" fill="#f8fafc"/>
+    <rect x="40" y="18" width="14" height="8" fill="#0284c7"/>
+    <rect x="62" y="18" width="14" height="8" fill="#0284c7"/>
+    <rect x="84" y="18" width="14" height="8" fill="#0284c7"/>
+    <polygon points="35,4 48,14 22,14" fill="#dc2626"/>
+  </g>
+  <!-- Red Flamboyant (Hoa Phuong Do) Tree Corner -->
+  <g opacity="0.92">
+    <circle cx="55" cy="60" r="48" fill="#dc2626"/>
+    <circle cx="115" cy="45" r="40" fill="#ef4444"/>
+    <circle cx="85" cy="95" r="35" fill="#f97316"/>
+    <circle cx="28" cy="110" r="30" fill="#b91c1c"/>
+  </g>
+  <g stroke="#5eead4" stroke-width="2" stroke-linecap="round" opacity="0.55">
+    <line x1="120" y1="355" x2="215" y2="355"/>
+    <line x1="510" y1="395" x2="640" y2="395"/>
+    <line x1="250" y1="435" x2="390" y2="435"/>
+  </g>
+</svg>

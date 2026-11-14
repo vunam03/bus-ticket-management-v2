@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="dnSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="45%" stop-color="#0369a1"/>
+      <stop offset="78%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#fde047"/>
+    </linearGradient>
+    <linearGradient id="dnRiver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fb923c" stop-opacity="0.75"/>
+      <stop offset="50%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#dnSky)"/>
+  <circle cx="220" cy="240" r="54" fill="#fef08a" opacity="0.92"/>
+  <!-- Marble mountains / Son Tra -->
+  <path d="M0,295 Q110,205 240,265 T520,255 T800,245 L800,320 L0,320 Z" fill="#1e293b" opacity="0.65"/>
+  <!-- City Skyline -->
+  <g fill="#0f172a" opacity="0.88">
+    <rect x="40" y="210" width="38" height="105" rx="3"/>
+    <rect x="90" y="180" width="46" height="135" rx="3"/>
+    <rect x="148" y="225" width="32" height="90" rx="3"/>
+    <rect x="610" y="195" width="42" height="120" rx="3"/>
+    <rect x="664" y="165" width="48" height="150" rx="3"/>
+    <rect x="724" y="215" width="36" height="100" rx="3"/>
+  </g>
+  <!-- Han River -->
+  <rect x="0" y="315" width="800" height="185" fill="url(#dnRiver)"/>
+  <!-- Dragon Bridge Silhouette -->
+  <rect x="0" y="312" width="800" height="10" fill="#334155"/>
+  <path d="M120,312 Q210,235 300,312 Q390,225 480,312 Q570,235 660,312" fill="none" stroke="#facc15" stroke-width="11" stroke-linecap="round"/>
+  <path d="M120,312 Q210,235 300,312 Q390,225 480,312 Q570,235 660,312" fill="none" stroke="#fef08a" stroke-width="4" stroke-linecap="round"/>
+  <!-- Dragon Head -->
+  <path d="M650,295 L695,272 L680,296 L705,302 L670,315 Z" fill="#facc15"/>
+  <!-- Water reflections -->
+  <g opacity="0.45">
+    <ellipse cx="210" cy="370" rx="60" ry="6" fill="#fde047"/>
+    <ellipse cx="390" cy="395" rx="85" ry="7" fill="#fde047"/>
+    <ellipse cx="570" cy="372" rx="60" ry="6" fill="#fde047"/>
+    <ellipse cx="220" cy="435" rx="95" ry="8" fill="#fb923c"/>
+  </g>
+</svg>

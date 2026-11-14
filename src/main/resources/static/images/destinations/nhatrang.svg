@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="ntSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="65%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+    <linearGradient id="ntSea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="55%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#ntSky)"/>
+  <circle cx="660" cy="95" r="44" fill="#fef08a"/>
+  <circle cx="660" cy="95" r="72" fill="#fef9c3" opacity="0.3"/>
+  <!-- Clouds -->
+  <g fill="#ffffff" opacity="0.88">
+    <ellipse cx="180" cy="95" rx="70" ry="18"/>
+    <ellipse cx="225" cy="90" rx="48" ry="16"/>
+    <ellipse cx="440" cy="125" rx="80" ry="16"/>
+  </g>
+  <!-- Distant Islands -->
+  <path d="M40,260 Q140,190 250,255 L280,265 L40,265 Z" fill="#0f766e" opacity="0.65"/>
+  <path d="M470,265 Q610,185 760,260 L790,265 L470,265 Z" fill="#115e59" opacity="0.72"/>
+  <!-- Sea -->
+  <rect x="0" y="255" width="800" height="245" fill="url(#ntSea)"/>
+  <!-- Sea sparkles & waves -->
+  <g stroke="#99f6e4" stroke-width="2.5" stroke-linecap="round" opacity="0.6">
+    <line x1="150" y1="295" x2="245" y2="295"/>
+    <line x1="420" y1="315" x2="530" y2="315"/>
+    <line x1="270" y1="345" x2="360" y2="345"/>
+    <line x1="590" y1="350" x2="690" y2="350"/>
+  </g>
+  <!-- Sailboats -->
+  <g transform="translate(360,248)">
+    <polygon points="15,0 15,38 40,38" fill="#ffffff"/>
+    <polygon points="12,8 12,38 -5,38" fill="#f1f5f9"/>
+    <path d="M-8,40 L44,40 L36,48 L0,48 Z" fill="#b45309"/>
+  </g>
+  <g transform="translate(510,270) scale(0.75)">
+    <polygon points="15,0 15,38 40,38" fill="#fef08a"/>
+    <path d="M-8,40 L44,40 L36,48 L0,48 Z" fill="#0f172a"/>
+  </g>
+  <!-- Golden Sandy Beach Foreground -->
+  <path d="M0,385 Q240,340 480,415 T800,395 L800,500 L0,500 Z" fill="#fde68a"/>
+  <path d="M0,415 Q260,375 510,445 T800,430 L800,500 L0,500 Z" fill="#fcd34d"/>
+  <!-- Tropical Coconut Palms -->
+  <path d="M75,465 Q95,330 135,235" fill="none" stroke="#78350f" stroke-width="11" stroke-linecap="round"/>
+  <g fill="#15803d" transform="translate(135,235)">
+    <path d="M0,0 Q-55,-20 -85,15 Q-40,5 0,0 Z"/>
+    <path d="M0,0 Q-30,-55 -65,-40 Q-25,-20 0,0 Z"/>
+    <path d="M0,0 Q35,-55 75,-25 Q30,-20 0,0 Z"/>
+    <path d="M0,0 Q65,-15 85,25 Q40,5 0,0 Z"/>
+    <path d="M0,0 Q15,45 45,65 Q10,30 0,0 Z"/>
+  </g>
+</svg>

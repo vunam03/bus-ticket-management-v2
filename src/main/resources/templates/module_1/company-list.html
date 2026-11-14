@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{shared/fragments :: head('Quản lý Nhà xe - Admin')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{shared/fragments :: navbar}"></nav>
+
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <div class="col-lg-2 px-0">
+            <aside th:replace="~{shared/fragments :: adminSidebar('companies')}"></aside>
+        </div>
+
+        <main class="col-lg-10 py-4 px-4">
+            <div th:replace="~{shared/fragments :: alerts}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1"><i class="bi bi-building-fill text-primary me-2"></i>Quản lý Danh sách Nhà xe Đối tác</h3>
+                    <p class="text-muted mb-0">Thêm mới, cập nhật thông tin liên hệ và quản lý trạng thái hợp tác các hãng xe khách</p>
+                </div>
+                <a th:href="@{/admin/trips/create}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Tạo chuyến xe mới
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <!-- Form Thêm / Chỉnh sửa Nhà xe -->
+                <div class="col-lg-4">
+                    <div class="admin-section-card p-4">
+                        <h5 class="fw-bold mb-3 pb-2 border-bottom">
+                            <i class="bi text-primary me-2" th:classappend="${editMode ? 'bi-pencil-square' : 'bi-plus-square-fill'}"></i>
+                            <span th:text="${editMode ? 'Cập nhật Thông tin Nhà xe' : 'Thêm Nhà xe Mới'}">Thêm Nhà xe Mới</span>
+                        </h5>
+
+                        <form th:action="@{/admin/companies/save}" th:object="${companyForm}" method="post">
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tên nhà xe <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{name}" class="form-control" placeholder="VD: Phương Trang (FUTA Bus Lines)" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-7">
+                                    <label class="form-label fw-semibold">Hotline <span class="text-danger">*</span></label>
+                                    <input type="text" th:field="*{hotline}" class="form-control" placeholder="VD: 1900 6067" required>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('hotline')}" th:errors="*{hotline}"></div>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-semibold">Đánh giá (1-5)</label>
+                                    <input type="number" step="0.1" min="1" max="5" th:field="*{rating}" class="form-control" required>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Địa chỉ trụ sở chính <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{headquarters}" class="form-control" placeholder="VD: 80 Trần Hưng Đạo, Quận 1, TP.HCM" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('headquarters')}" th:errors="*{headquarters}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Mô tả &amp; dịch vụ nổi bật</label>
+                                <textarea th:field="*{description}" class="form-control" rows="3" placeholder="Giới thiệu chất lượng xe, tiện ích hành trình..."></textarea>
+                            </div>
+
+                            <div class="form-check form-switch mb-4">
+                                <input class="form-check-input" type="checkbox" th:field="*{active}" id="companyActiveSwitch">
+                                <label class="form-check-label fw-semibold" for="companyActiveSwitch">Đang hoạt động mở bán vé</label>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary fw-semibold">
+                                    <i class="bi bi-save2 me-1"></i>
+                                    <span th:text="${editMode ? 'Lưu thay đổi Nhà xe' : 'Thêm Nhà xe mới'}">Lưu</span>
+                                </button>
+                                <a th:if="${editMode}" th:href="@{/admin/companies}" class="btn btn-outline-secondary btn-sm">
+                                    Hủy chỉnh sửa
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Bảng danh sách Nhà xe -->
+                <div class="col-lg-8">
+                    <div class="admin-section-card overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">ID</th>
+                                    <th>Nhà xe</th>
+                                    <th>Hotline &amp; Trụ sở</th>
+                                    <th class="text-center">Đánh giá</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th class="text-end pe-3">Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:if="${#lists.isEmpty(companies)}">
+                                    <td colspan="6" class="text-center py-5 text-muted">Chưa có nhà xe nào trong hệ thống.</td>
+                                </tr>
+                                <tr th:each="c : ${companies}" class="trip-table-row">
+                                    <td class="ps-3 text-muted fw-semibold" th:text="${'#' + c.id}">#1</td>
+                                    <td>
+                                        <div class="fw-bold text-dark" th:text="${c.name}">Phương Trang</div>
+                                        <small class="text-muted" th:text="${c.description}">Mô tả ngắn</small>
+                                    </td>
+                                    <td>
+                                        <div class="small fw-semibold text-primary">
+                                            <i class="bi bi-telephone-fill me-1"></i><span th:text="${c.hotline}">1900 6067</span>
+                                        </div>
+                                        <div class="small text-secondary" th:text="${c.headquarters}">TP.HCM</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="company-rating-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span th:text="${c.rating}">4.8</span>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge"
+                                              th:classappend="${c.active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary'}"
+                                              th:text="${c.active ? 'Hoạt động' : 'Tạm ngưng'}">Hoạt động</span>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-inline-flex gap-1">
+                                            <a th:href="@{/admin/companies/edit/{id}(id=${c.id})}" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form th:action="@{/admin/companies/toggle/{id}(id=${c.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm"
+                                                        th:classappend="${c.active ? 'btn-outline-warning' : 'btn-outline-success'}"
+                                                        th:title="${c.active ? 'Tạm ngưng hợp tác' : 'Kích hoạt lại'}">
+                                                    <i class="bi" th:classappend="${c.active ? 'bi-pause-circle' : 'bi-play-circle'}"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="~{shared/fragments :: footer}"></footer>
+<div th:replace="~{shared/fragments :: scripts(null)}"></div>
+</body>
+</html>

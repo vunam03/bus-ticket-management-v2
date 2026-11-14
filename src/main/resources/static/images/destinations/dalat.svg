@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="dlSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="48%" stop-color="#a855f7"/>
+      <stop offset="78%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="dlLake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f9a8d4" stop-opacity="0.75"/>
+      <stop offset="55%" stop-color="#4338ca"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <radialGradient id="dlSun" cx="50%" cy="55%" r="28%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="45%" stop-color="#fda4af" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#fda4af" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#dlSky)"/>
+  <circle cx="460" cy="240" r="145" fill="url(#dlSun)"/>
+  <circle cx="460" cy="235" r="46" fill="#fef9c3" opacity="0.95"/>
+  <!-- Far misty mountains -->
+  <path d="M0,290 Q120,185 260,245 T530,205 T800,260 L800,360 L0,360 Z" fill="#4c1d95" opacity="0.65"/>
+  <!-- Mist layer -->
+  <path d="M0,285 Q180,265 360,290 T740,275 L800,285 L800,330 L0,330 Z" fill="#f5d0fe" opacity="0.32"/>
+  <!-- Mid pine hills -->
+  <path d="M0,315 Q160,230 340,295 T640,255 T800,305 L800,375 L0,375 Z" fill="#1e3a5f"/>
+  <!-- Lake Xuan Huong -->
+  <rect x="0" y="348" width="800" height="152" fill="url(#dlLake)"/>
+  <ellipse cx="460" cy="400" rx="135" ry="12" fill="#fde68a" opacity="0.35"/>
+  <ellipse cx="460" cy="422" rx="90" ry="7" fill="#fef08a" opacity="0.28"/>
+  <!-- Lam Vien glass dome landmark -->
+  <g transform="translate(520,308)">
+    <polygon points="0,42 35,4 70,42" fill="#facc15" opacity="0.9"/>
+    <polygon points="10,42 35,8 60,42" fill="#fef08a" opacity="0.55"/>
+    <line x1="35" y1="4" x2="20" y2="42" stroke="#1e293b" stroke-width="1.5"/>
+    <line x1="35" y1="4" x2="50" y2="42" stroke="#1e293b" stroke-width="1.5"/>
+    <polygon points="72,42 100,14 128,42" fill="#34d399" opacity="0.88"/>
+  </g>
+  <!-- Pine silhouettes foreground left & right -->
+  <g fill="#0f172a">
+    <polygon points="45,455 75,320 105,455"/>
+    <polygon points="52,415 75,310 98,415"/>
+    <polygon points="95,465 125,345 155,465"/>
+    <polygon points="150,475 174,375 198,475"/>
+    <polygon points="660,475 690,340 720,475"/>
+    <polygon points="710,465 745,305 780,465"/>
+  </g>
+  <!-- Cherry blossom accents -->
+  <circle cx="215" cy="365" r="24" fill="#f472b6" opacity="0.85"/>
+  <circle cx="242" cy="378" r="18" fill="#fbcfe8" opacity="0.9"/>
+  <circle cx="195" cy="384" r="16" fill="#ec4899" opacity="0.85"/>
+  <rect x="0" y="455" width="800" height="45" fill="#090d16" opacity="0.82"/>
+</svg>
