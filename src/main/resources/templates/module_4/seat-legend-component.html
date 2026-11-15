@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="seatLegend" class="seat-legend-wrapper card border-0 shadow-sm p-3 mb-4">
+    <!-- Hàng 1: 6 trạng thái ghế trực quan -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4">
+            <div class="seat-legend-item">
+                <span class="seat-legend-box seat-legend-available"></span>
+                <span>Ghế trống</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box seat-legend-selected"></span>
+                <span>Đang chọn</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box seat-legend-held-me"></span>
+                <span>Bạn đang giữ</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box seat-legend-held"></span>
+                <span>Người khác đang giữ</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box seat-legend-booked"></span>
+                <span>Đã bán</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box seat-legend-unavailable"></span>
+                <span>Không khả dụng</span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span id="liveSyncBadge" class="seat-sync-pill is-online" title="Tự động cập nhật trạng thái ghế mỗi 6 giây">
+                <span class="sync-dot"></span>
+                <span class="sync-text">Đồng bộ trực tiếp</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Hàng 2: Gợi ý chọn ghế thông minh (ưu tiên liền kề & theo tầng mong muốn, tối đa 6 ghế) -->
+    <div class="smart-suggest-bar">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="small text-muted fw-semibold">
+                <i class="bi bi-magic text-primary me-1"></i>Gợi ý chọn ghế thông minh:
+            </span>
+            <select id="suggestFloorSelect" class="form-select form-select-sm w-auto" aria-label="Chọn tầng mong muốn"
+                    th:disabled="${!hasTwoFloors}">
+                <option value="">Tự động theo cụm gần nhất</option>
+                <option value="1">Ưu tiên Tầng 1</option>
+                <option value="2" th:if="${hasTwoFloors}">Ưu tiên Tầng 2</option>
+            </select>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Chọn nhanh số ghế">
+                <button type="button" class="btn btn-outline-primary quick-pick-seat-btn" data-pick-count="1">1 ghế</button>
+                <button type="button" class="btn btn-outline-primary quick-pick-seat-btn" data-pick-count="2">2 ghế</button>
+                <button type="button" class="btn btn-outline-primary quick-pick-seat-btn" data-pick-count="3">3 ghế</button>
+                <button type="button" class="btn btn-outline-primary quick-pick-seat-btn" data-pick-count="4">4 ghế</button>
+                <button type="button" class="btn btn-outline-primary quick-pick-seat-btn" data-pick-count="6">6 ghế</button>
+            </div>
+            <button type="button" id="clearSelectedSeatsBtn" class="btn btn-sm btn-outline-secondary" title="Bỏ chọn toàn bộ ghế">
+                <i class="bi bi-eraser me-1"></i>Bỏ chọn tất cả
+            </button>
+        </div>
+
+        <div id="smartSuggestFeedback" class="small mt-2 d-none" role="status"></div>
+    </div>
+
+    <!-- Cảnh báo khi chọn vượt quá 6 ghế -->
+    <div id="seatLimitWarning" class="alert alert-warning py-2 px-3 small mt-3 mb-0 d-none" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        Mỗi lần giao dịch chỉ được chọn tối đa <strong>6 ghế</strong>. Vui lòng bỏ chọn bớt trước khi chọn thêm!
+    </div>
+
+    <!-- Cảnh báo cập nhật thời gian thực (khi có ghế bị người khác giữ mất hoặc mất kết nối) -->
+    <div id="seatRealtimeAlert" class="alert alert-danger py-2 px-3 small mt-3 mb-0 d-none" role="alert"></div>
+
+    <!-- Thanh lọc tầng & thống kê số lượng ghế -->
+    <div class="floor-filter-bar">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="small text-muted fw-semibold"><i class="bi bi-layers me-1"></i>Hiển thị tầng:</span>
+            <button type="button" class="btn btn-sm btn-outline-dark floor-filter-btn active" data-floor-filter="all">Tất cả</button>
+            <button type="button" class="btn btn-sm btn-outline-dark floor-filter-btn" data-floor-filter="1">Tầng 1</button>
+            <button type="button" class="btn btn-sm btn-outline-dark floor-filter-btn" data-floor-filter="2" th:if="${hasTwoFloors}">Tầng 2</button>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="seat-status-counter-pill">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                Còn trống: <span id="liveAvailableSeatsCount" th:text="${seatLayout != null ? seatLayout.availableCount : trip.availableSeats}">0</span>
+            </span>
+            <span class="seat-status-counter-pill">
+                <i class="bi bi-hourglass-split text-warning"></i>
+                Đang giữ: <span id="liveHeldSeatsCount" th:text="${seatLayout != null ? seatLayout.heldCount : 0}">0</span>
+            </span>
+            <span class="seat-status-counter-pill">
+                <i class="bi bi-ticket-fill text-secondary"></i>
+                Đã bán: <span id="liveBookedSeatsCount" th:text="${seatLayout != null ? seatLayout.bookedCount : 0}">0</span>
+            </span>
+            <span class="seat-status-counter-pill">
+                <i class="bi bi-grid-fill text-primary"></i>
+                Tổng ghế: <span th:text="${trip.totalSeats}">40</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="seatPickingRules" class="seat-policy-card mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <h6 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-info-circle-fill text-primary me-2"></i>Quy định giữ chỗ &amp; Vòng đời ghế
+        </h6>
+        <span class="badge bg-primary-subtle text-primary">Tối đa 6 ghế / lượt &bull; Gia hạn tối đa 15 phút</span>
+    </div>
+
+    <div class="row g-3 small text-secondary">
+        <div class="col-md-4">
+            <div class="seat-policy-item h-100">
+                <div class="fw-bold text-dark mb-1"><i class="bi bi-stopwatch text-warning me-1"></i>Giữ ghế 10 – 15 phút</div>
+                <p class="mb-0">Hệ thống khóa ghế mặc định trong 10 phút cho bạn khi chuyển thanh toán. Có thể gia hạn thêm tối đa tổng thời gian 15 phút kể từ lúc giữ.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="seat-policy-item h-100">
+                <div class="fw-bold text-dark mb-1"><i class="bi bi-lock-fill text-primary me-1"></i>Chống đặt trùng thời gian thực</div>
+                <p class="mb-0">Trạng thái sơ đồ ghế tự động cập nhật định kỳ để bạn biết ngay khi có hành khách khác vừa giữ hoặc mua ghế.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="seat-policy-item h-100">
+                <div class="fw-bold text-dark mb-1"><i class="bi bi-arrow-left-right text-success me-1"></i>Đổi hoặc hủy giữ linh hoạt</div>
+                <p class="mb-0">Trước khi thanh toán, bạn có thể đổi sang ghế trống khác hoặc hủy giữ ghế để trả ghế về trạng thái trống ngay lập tức.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
