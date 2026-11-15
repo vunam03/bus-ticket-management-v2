@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{shared/fragments :: head('Chọn ghế - ' + ${trip.tripCode})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{shared/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{shared/fragments :: alerts}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-primary mb-1" th:text="${trip.busCompany.companyName}">Nhà xe</span>
+            <h3 class="fw-bold mb-0">
+                Chọn ghế: <span th:text="${trip.departureProvince}">Hà Nội</span>
+                <i class="bi bi-arrow-right mx-2 text-primary"></i>
+                <span th:text="${trip.arrivalProvince}">Đà Nẵng</span>
+            </h3>
+            <p class="text-muted small mb-0">
+                Khởi hành: <strong th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}">08:00</strong>
+                &bull; Loại xe: <strong th:text="${trip.busType.displayName}">Giường nằm 40 chỗ</strong>
+            </p>
+        </div>
+        <a th:href="@{/trips/{id}(id=${trip.id})}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Chi tiết chuyến xe
+        </a>
+    </div>
+
+    <!-- Chú thích trạng thái ghế -->
+    <div class="card border-0 shadow-sm p-3 mb-4">
+        <div class="d-flex flex-wrap justify-content-center gap-4">
+            <div class="seat-legend-item">
+                <span class="seat-legend-box" style="background:#ffffff; border:2px solid #94a3b8;"></span>
+                <span>Ghế trống (Có thể chọn)</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box" style="background:#2563eb; border:2px solid #1d4ed8;"></span>
+                <span>Ghế đang chọn</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box" style="background:#fef3c7; border:2px solid #f59e0b;"></span>
+                <span>Đang giữ tạm (10 phút)</span>
+            </div>
+            <div class="seat-legend-item">
+                <span class="seat-legend-box" style="background:#e2e8f0; border:2px solid #cbd5e1;"></span>
+                <span>Đã đặt (Không thể chọn)</span>
+            </div>
+        </div>
+    </div>
+
+    <form id="seatHoldForm" th:action="@{/booking/trip/{id}/hold(id=${trip.id})}" method="post">
+        <div id="selectedSeatInputsContainer"></div>
+
+        <div class="row g-4">
+            <!-- Sơ đồ ghế bên trái (1 hoặc 2 tầng) -->
+            <div class="col-lg-8">
+                <div class="row g-4">
+                    <!-- Tầng 1 -->
+                    <div th:class="${hasTwoFloors ? 'col-md-6' : 'col-12'}">
+                        <div class="bus-floor-card h-100">
+                            <div class="bus-floor-header">
+                                <span class="fw-bold text-dark">
+                                    <i class="bi bi-layers-half text-primary me-1"></i>
+                                    <span th:text="${hasTwoFloors ? 'Tầng 1 (Tầng dưới)' : 'Sơ đồ ghế toàn xe (' + trip.totalSeats + ' chỗ)'}">Tầng 1</span>
+                                </span>
+                                <span class="steering-wheel-icon" title="Vị trí Tài xế">
+                                    <i class="bi bi-life-preserver"></i>
+                                </span>
+                            </div>
+
+                            <div class="seat-grid-container">
+                                <button th:each="seat : ${floor1Seats}"
+                                        type="button"
+                                        class="seat-btn"
+                                        th:classappend="${seat.status.name() == 'AVAILABLE' ? 'seat-available' : (seat.status.name() == 'HELD' ? 'seat-held' : 'seat-booked')}"
+                                        th:disabled="${seat.status.name() != 'AVAILABLE'}"
+                                        th:data-seat-id="${seat.id}"
+                                        th:data-seat-number="${seat.seatNumber}"
+                                        th:data-seat-price="${seat.price}">
+                                    <span class="seat-code" th:text="${seat.seatNumber}">A01</span>
+                                    <span class="seat-sub" th:text="${seat.status.name() == 'AVAILABLE' ? (#numbers.formatDecimal(seat.price/1000, 0, 'COMMA', 0, 'POINT') + 'k') : seat.status.displayName}">350k</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tầng 2 (nếu xe giường nằm/limousine 2 tầng) -->
+                    <div class="col-md-6" th:if="${hasTwoFloors}">
+                        <div class="bus-floor-card h-100">
+                            <div class="bus-floor-header">
+                                <span class="fw-bold text-dark">
+                                    <i class="bi bi-layers-fill text-primary me-1"></i>Tầng 2 (Tầng trên)
+                                </span>
+                                <span class="badge bg-light text-secondary border">Cầu thang lên</span>
+                            </div>
+
+                            <div class="seat-grid-container">
+                                <button th:each="seat : ${floor2Seats}"
+                                        type="button"
+                                        class="seat-btn"
+                                        th:classappend="${seat.status.name() == 'AVAILABLE' ? 'seat-available' : (seat.status.name() == 'HELD' ? 'seat-held' : 'seat-booked')}"
+                                        th:disabled="${seat.status.name() != 'AVAILABLE'}"
+                                        th:data-seat-id="${seat.id}"
+                                        th:data-seat-number="${seat.seatNumber}"
+                                        th:data-seat-price="${seat.price}">
+                                    <span class="seat-code" th:text="${seat.seatNumber}">B01</span>
+                                    <span class="seat-sub" th:text="${seat.status.name() == 'AVAILABLE' ? (#numbers.formatDecimal(seat.price/1000, 0, 'COMMA', 0, 'POINT') + 'k') : seat.status.displayName}">350k</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tóm tắt chọn chỗ bên phải -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 90px;">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">
+                        <i class="bi bi-receipt-cutoff text-primary me-2"></i>Tóm tắt chọn chỗ
+                    </h5>
+
+                    <div class="summary-banner-thumb">
+                        <img th:src="@{${trip.destinationImageUrl}}" th:alt="${trip.arrivalProvince}">
+                        <div class="summary-banner-overlay">
+                            <span class="small fw-bold" th:text="${trip.arrivalProvince}">Điểm đến</span>
+                            <span class="text-white-50" style="font-size: 0.74rem;" th:text="${trip.destinationHighlight}">Mô tả điểm đến</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tuyến đường:</span>
+                            <strong th:text="${trip.departureProvince + ' → ' + trip.arrivalProvince}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Bến đón:</span>
+                            <strong th:text="${trip.departureStation}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Giờ xuất bến:</span>
+                            <strong class="text-primary" th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Đơn giá vé:</span>
+                            <strong th:text="${#numbers.formatDecimal(trip.ticketPrice, 0, 'COMMA', 0, 'POINT') + ' đ/ghế'}"></strong>
+                        </div>
+                    </div>
+
+                    <div class="bg-light rounded-3 p-3 mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Số lượng ghế chọn:</span>
+                            <strong id="selectedSeatsCount">0 ghế</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Mã ghế đang chọn:</span>
+                            <strong id="selectedSeatsDisplay" class="text-primary">Chưa chọn ghế</strong>
+                        </div>
+                        <div class="d-flex justify-content-between pt-2 border-top">
+                            <span class="fw-bold">Tổng tiền tạm tính:</span>
+                            <strong id="selectedTotalPrice" class="fs-5 text-danger">0 đ</strong>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info small py-2 mb-3">
+                        <i class="bi bi-shield-lock-fill me-1"></i>
+                        Khi nhấn <strong>Giữ ghế &amp; Tiếp tục</strong>, hệ thống sẽ khóa ghế riêng cho bạn trong <strong>10 phút</strong> để chống đặt trùng.
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" id="submitHoldSeatsBtn" class="btn btn-primary btn-lg fw-bold" disabled>
+                            <i class="bi bi-lock-fill me-1"></i>Giữ ghế &amp; Tiếp tục thanh toán
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{shared/fragments :: footer}"></footer>
+<div th:replace="~{shared/fragments :: scripts('/js/module_4/seat-selection.js')}"></div>
+</body>
+</html>
