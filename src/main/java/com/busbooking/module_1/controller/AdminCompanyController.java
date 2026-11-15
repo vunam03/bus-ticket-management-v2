@@ -2,8 +2,8 @@ package com.busbooking.module_1.controller;
 
 import com.busbooking.module_1.dto.BusCompanyFormDto;
 import com.busbooking.module_1.service.BusCompanyService;
-import com.busbooking.shared.exception.BusinessException;
-import com.busbooking.shared.model.BusCompany;
+import com.busbooking.common.exception.BusinessException;
+import com.busbooking.module_1.model.BusCompany;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

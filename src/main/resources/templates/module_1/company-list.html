@@ -1,17 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{shared/fragments :: head('Quản lý Nhà xe - Admin')}"></head>
+<head th:replace="~{common/fragments :: head('Quản lý Nhà xe - Admin')}"></head>
 <body class="d-flex flex-column min-vh-100">
-<nav th:replace="~{shared/fragments :: navbar}"></nav>
+<nav th:replace="~{common/fragments :: navbar}"></nav>
 
 <div class="container-fluid flex-grow-1">
     <div class="row">
         <div class="col-lg-2 px-0">
-            <aside th:replace="~{shared/fragments :: adminSidebar('companies')}"></aside>
+            <aside th:replace="~{common/fragments :: adminSidebar('companies')}"></aside>
         </div>
 
         <main class="col-lg-10 py-4 px-4">
-            <div th:replace="~{shared/fragments :: alerts}"></div>
+            <div th:replace="~{common/fragments :: alerts}"></div>
 
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
                 <div>
@@ -150,7 +150,7 @@
     </div>
 </div>
 
-<footer th:replace="~{shared/fragments :: footer}"></footer>
-<div th:replace="~{shared/fragments :: scripts(null)}"></div>
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts(null)}"></div>
 </body>
 </html>

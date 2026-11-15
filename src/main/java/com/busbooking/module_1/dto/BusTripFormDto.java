@@ -1,7 +1,7 @@
 package com.busbooking.module_1.dto;
 
-import com.busbooking.shared.enums.BusType;
-import com.busbooking.shared.enums.TripStatus;
+import com.busbooking.common.enums.BusType;
+import com.busbooking.common.enums.TripStatus;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 

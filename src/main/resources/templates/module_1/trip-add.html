@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{common/fragments :: head('Tạo Chuyến Xe &amp; Xem Trước Sơ Đồ Ghế - Admin')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <div class="col-lg-2 px-0">
+            <aside th:replace="~{common/fragments :: adminSidebar('trip-create')}"></aside>
+        </div>
+
+        <main class="col-lg-10 py-4 px-4">
+            <div th:replace="~{common/fragments :: alerts}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Thiết lập Chuyến Xe Mới</h3>
+                    <p class="text-muted mb-0">Kiểm tra thời lượng, định dạng biển kiểm soát và xem trước sơ đồ ghế 36/40/45 trước khi lưu</p>
+                </div>
+                <a th:href="@{/admin/trips/board}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Về Bảng điều phối
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="admin-section-card p-4">
+                        <form th:action="@{/admin/trips/save}" th:object="${tripForm}" method="post" id="tripConfigForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nhà xe vận hành *</label>
+                                    <select th:field="*{companyId}" class="form-select" required>
+                                        <option value="">-- Chọn nhà xe đang hợp tác --</option>
+                                        <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name + ' (' + c.hotline + ')'}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Cấu hình loại xe *</label>
+                                    <select th:field="*{busType}" id="busTypeSelect" class="form-select" required>
+                                        <option th:each="bt : ${busTypes}" th:value="${bt}" th:text="${bt.displayName}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Biển số xe *</label>
+                                    <input type="text" th:field="*{licensePlate}" id="licensePlateInput" class="form-control text-uppercase" placeholder="VD: 29B-123.45" required>
+                                    <small id="licensePlateHint" class="form-text text-muted">VD: 29B-123.45 hoặc 51B-67890</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Tỉnh / Thành phố đi *</label>
+                                    <input type="text" th:field="*{departureProvince}" id="depProvinceInput" class="form-control" placeholder="VD: Hà Nội" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Tỉnh / Thành phố đến *</label>
+                                    <input type="text" th:field="*{arrivalProvince}" id="arrProvinceInput" class="form-control" placeholder="VD: Đà Nẵng" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Bến xe đón khách *</label>
+                                    <input type="text" th:field="*{departureStation}" class="form-control" placeholder="VD: Bến xe Mỹ Đình" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Bến xe trả khách *</label>
+                                    <input type="text" th:field="*{arrivalStation}" class="form-control" placeholder="VD: Bến xe Trung tâm Đà Nẵng" required>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Giờ khởi hành *</label>
+                                    <input type="datetime-local" th:field="*{departureTime}" id="departureTimeInput" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Giờ đến dự kiến *</label>
+                                    <input type="datetime-local" th:field="*{arrivalTime}" id="arrivalTimeInput" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Giá vé (VNĐ) *</label>
+                                    <input type="number" step="5000" min="10000" th:field="*{ticketPrice}" id="ticketPriceInput" class="form-control" required>
+                                    <small id="pricePreviewHint" class="text-primary fw-semibold"></small>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Tiện ích phục vụ trên xe</label>
+                                    <textarea th:field="*{amenities}" class="form-control" rows="2" placeholder="Wifi tốc độ cao, Nước suối, Cổng sạc USB, Rèm che riêng tư..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                <a th:href="@{/admin/trips}" class="btn btn-outline-secondary">Hủy bỏ</a>
+                                <button type="submit" class="btn btn-primary fw-semibold px-4">
+                                    <i class="bi bi-check2-circle me-1"></i>Lưu &amp; Sinh Sơ Đồ Ghế
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="admin-section-card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Xem trước Cấu hình</h5>
+                        <div class="alert alert-info py-2 small mb-3">
+                            <span id="seatCountPreview" class="fw-bold">Tự động tạo 40 ghế (2 tầng)</span>
+                        </div>
+                        <div class="mb-3 p-3 bg-light rounded-3 small">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Thời lượng dự kiến:</span>
+                                <strong id="durationPreviewBadge" class="text-dark">6 giờ</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Cảnh báo tuyến:</span>
+                                <strong id="routeCheckBadge" class="text-success">Hợp lệ</strong>
+                            </div>
+                        </div>
+                        <div class="seat-preview-grid-box" id="seatDiagramMiniPreview"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_1/trip-form.js')}"></div>
+</body>
+</html>

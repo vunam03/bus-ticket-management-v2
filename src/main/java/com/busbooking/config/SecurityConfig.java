@@ -1,6 +1,6 @@
 package com.busbooking.config;
 
-import com.busbooking.shared.enums.RoleName;
+import com.busbooking.common.enums.RoleName;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,12 +46,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/h2-console/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/h2-console", "/h2-console/**").permitAll()
                         .requestMatchers("/", "/trips/**", "/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
-                        .requestMatchers("/booking/**", "/tickets/**", "/user/**").authenticated()
+                        .requestMatchers("/booking/**", "/tickets/**", "/user/**", "/account/**").authenticated()
                         .anyRequest().permitAll()
                 )
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console", "/h2-console/**"))
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/auth/login")

@@ -1,7 +1,7 @@
 package com.busbooking.module_1.repository;
 
-import com.busbooking.shared.enums.SeatStatus;
-import com.busbooking.shared.model.Seat;
+import com.busbooking.module_4.enums.SeatStatus;
+import com.busbooking.module_4.model.Seat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,24 +1,35 @@
 package com.busbooking.module_1.service;
 
+import com.busbooking.common.enums.BusType;
+import com.busbooking.module_4.enums.SeatStatus;
+import com.busbooking.common.enums.TripStatus;
+import com.busbooking.common.exception.ResourceNotFoundException;
+import com.busbooking.common.utils.CodeGeneratorUtils;
 import com.busbooking.module_1.dto.BusTripFormDto;
+import com.busbooking.module_1.dto.BusTripRequest;
+import com.busbooking.module_1.dto.BusTripResponse;
+import com.busbooking.module_1.dto.BusTripSearchCriteria;
+import com.busbooking.module_1.exception.TripManagementException;
+import com.busbooking.module_1.model.BusCompany;
+import com.busbooking.module_1.model.BusTrip;
 import com.busbooking.module_1.repository.BusTripRepository;
 import com.busbooking.module_1.repository.TripSeatGeneratorRepository;
-import com.busbooking.module_1.validator.TripValidator;
-import com.busbooking.shared.enums.BusType;
-import com.busbooking.shared.enums.SeatStatus;
-import com.busbooking.shared.enums.TripStatus;
-import com.busbooking.shared.exception.BusinessException;
-import com.busbooking.shared.exception.ResourceNotFoundException;
-import com.busbooking.shared.model.BusCompany;
-import com.busbooking.shared.model.BusTrip;
-import com.busbooking.shared.model.Seat;
-import com.busbooking.shared.utils.CodeGeneratorUtils;
+import com.busbooking.module_1.validator.BusTripValidator;
+import com.busbooking.module_4.model.Seat;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BusTripService {
@@ -26,12 +37,12 @@ public class BusTripService {
     private final BusTripRepository tripRepository;
     private final TripSeatGeneratorRepository seatGeneratorRepository;
     private final BusCompanyService companyService;
-    private final TripValidator tripValidator;
+    private final BusTripValidator tripValidator;
 
     public BusTripService(BusTripRepository tripRepository,
                           TripSeatGeneratorRepository seatGeneratorRepository,
                           BusCompanyService companyService,
-                          TripValidator tripValidator) {
+                          BusTripValidator tripValidator) {
         this.tripRepository = tripRepository;
         this.seatGeneratorRepository = seatGeneratorRepository;
         this.companyService = companyService;
@@ -44,9 +55,41 @@ public class BusTripService {
     }
 
     @Transactional(readOnly = true)
+    public Page<BusTrip> searchAdminTrips(BusTripSearchCriteria criteria) {
+        BusTripSearchCriteria safe = criteria != null ? criteria : new BusTripSearchCriteria();
+        Sort sort = resolveAdminSort(safe.getSortBy());
+        Pageable pageable = PageRequest.of(safe.getPage(), safe.getSize(), sort);
+
+        LocalDateTime dayStart = safe.getDepartureDate() != null ? safe.getDepartureDate().atStartOfDay() : null;
+        LocalDateTime dayEnd = safe.getDepartureDate() != null ? safe.getDepartureDate().plusDays(1).atStartOfDay() : null;
+
+        return tripRepository.searchAdminTrips(
+                safe.getNormalizedKeyword(),
+                safe.getCompanyId(),
+                safe.getStatus(),
+                safe.getBusType(),
+                safe.getMinPrice(),
+                safe.getMaxPrice(),
+                dayStart,
+                dayEnd,
+                pageable
+        );
+    }
+
+    @Transactional(readOnly = true)
     public BusTrip getTripById(Long id) {
         return tripRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chuyến xe với ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public BusTripResponse getTripResponseById(Long id) {
+        return BusTripResponse.fromEntity(getTripById(id));
+    }
+
+    @Transactional
+    public BusTrip createTrip(BusTripRequest request) {
+        return createTrip(request.toFormDto());
     }
 
     /**
@@ -57,7 +100,7 @@ public class BusTripService {
         tripValidator.validateTripForm(dto);
         BusCompany company = companyService.getCompanyById(dto.getCompanyId());
         if (!company.isActive()) {
-            throw new BusinessException("COMPANY_INACTIVE", "Nhà xe đang ngừng hoạt động, không thể thêm chuyến xe mới.");
+            throw TripManagementException.companyInactive(company.getName());
         }
 
         BusType busType = dto.getBusType();
@@ -65,21 +108,11 @@ public class BusTripService {
 
         BusTrip trip = new BusTrip();
         trip.setTripCode(CodeGeneratorUtils.generateTripCode());
-        trip.setBusCompany(company);
-        trip.setDepartureProvince(dto.getDepartureProvince().trim());
-        trip.setDepartureStation(dto.getDepartureStation().trim());
-        trip.setArrivalProvince(dto.getArrivalProvince().trim());
-        trip.setArrivalStation(dto.getArrivalStation().trim());
-        trip.setRouteName(dto.getDepartureProvince().trim() + " - " + dto.getArrivalProvince().trim());
-        trip.setDepartureTime(dto.getDepartureTime());
-        trip.setArrivalTime(dto.getArrivalTime());
-        trip.setTicketPrice(dto.getTicketPrice());
+        applyTripDetails(trip, company, dto);
         trip.setBusType(busType);
-        trip.setLicensePlate(dto.getLicensePlate().trim().toUpperCase());
         trip.setTotalSeats(totalSeats);
         trip.setAvailableSeats(totalSeats);
-        trip.setStatus(TripStatus.SCHEDULED);
-        trip.setAmenities(dto.getAmenities() != null ? dto.getAmenities().trim() : "Wifi, Nước suối, Điều hòa");
+        trip.setStatus(dto.getStatus() != null ? dto.getStatus() : TripStatus.SCHEDULED);
 
         BusTrip savedTrip = tripRepository.save(trip);
         generateSeatDiagram(savedTrip);
@@ -100,21 +133,10 @@ public class BusTripService {
         long activeTickets = tripRepository.countActiveTicketsByTripId(id);
 
         if (busTypeChanged && activeTickets > 0) {
-            throw new BusinessException("CANNOT_CHANGE_BUS_TYPE",
-                    "Chuyến xe đã có khách đặt vé, không thể thay đổi loại sơ đồ ghế.");
+            throw TripManagementException.lockedByActiveTickets(trip.getTripCode());
         }
 
-        trip.setBusCompany(company);
-        trip.setDepartureProvince(dto.getDepartureProvince().trim());
-        trip.setDepartureStation(dto.getDepartureStation().trim());
-        trip.setArrivalProvince(dto.getArrivalProvince().trim());
-        trip.setArrivalStation(dto.getArrivalStation().trim());
-        trip.setRouteName(dto.getDepartureProvince().trim() + " - " + dto.getArrivalProvince().trim());
-        trip.setDepartureTime(dto.getDepartureTime());
-        trip.setArrivalTime(dto.getArrivalTime());
-        trip.setTicketPrice(dto.getTicketPrice());
-        trip.setLicensePlate(dto.getLicensePlate().trim().toUpperCase());
-        trip.setAmenities(dto.getAmenities() != null ? dto.getAmenities().trim() : trip.getAmenities());
+        applyTripDetails(trip, company, dto);
         if (dto.getStatus() != null) {
             trip.setStatus(dto.getStatus());
         }
@@ -140,6 +162,34 @@ public class BusTripService {
     }
 
     /**
+     * Nhân bản một chuyến xe sang ngày khởi hành tiếp theo để Admin lập lịch nhanh.
+     */
+    @Transactional
+    public BusTrip duplicateTrip(Long sourceTripId, int plusDays) {
+        BusTrip source = getTripById(sourceTripId);
+        int daysOffset = Math.max(1, Math.min(plusDays, 30));
+        Duration tripDuration = Duration.between(source.getDepartureTime(), source.getArrivalTime());
+
+        BusTripFormDto dto = toFormDto(source);
+        dto.setId(null);
+        LocalDateTime nextDeparture = source.getDepartureTime().plusDays(daysOffset);
+        dto.setDepartureTime(nextDeparture);
+        dto.setArrivalTime(nextDeparture.plus(tripDuration));
+        dto.setStatus(TripStatus.SCHEDULED);
+        return createTrip(dto);
+    }
+
+    @Transactional
+    public BusTrip updateTripStatus(Long id, TripStatus newStatus) {
+        if (newStatus == null) {
+            throw TripManagementException.invalidSchedule("Trạng thái chuyến xe mới không được để trống.");
+        }
+        BusTrip trip = getTripById(id);
+        trip.setStatus(newStatus);
+        return tripRepository.save(trip);
+    }
+
+    /**
      * Hủy chuyến xe an toàn: chuyển trạng thái sang CANCELLED, giữ nguyên dữ liệu vé của khách để đối soát/hoàn tiền.
      */
     @Transactional
@@ -159,11 +209,11 @@ public class BusTripService {
         if (ticketCount > 0) {
             trip.setStatus(TripStatus.CANCELLED);
             tripRepository.save(trip);
-            return false; // Đã chuyển sang hủy chuyến thay vì xóa cứng
+            return false;
         }
         seatGeneratorRepository.deleteByBusTripId(id);
         tripRepository.delete(trip);
-        return true; // Đã xóa hoàn toàn
+        return true;
     }
 
     /**
@@ -176,7 +226,6 @@ public class BusTripService {
         List<Seat> seats = new ArrayList<>(totalSeats);
 
         if (floors == 2) {
-            // Xe giường nằm 2 tầng (36 hoặc 40 chỗ): Tầng 1 (A01..A18/20), Tầng 2 (B01..B18/20)
             int seatsPerFloor = totalSeats / 2;
             int cols = 3;
             for (int floor = 1; floor <= 2; floor++) {
@@ -189,7 +238,6 @@ public class BusTripService {
                 }
             }
         } else {
-            // Xe ghế ngồi 1 tầng (45 chỗ): 4 cột mỗi hàng + băng cuối
             int cols = 4;
             for (int i = 1; i <= totalSeats; i++) {
                 int row = ((i - 1) / cols) + 1;
@@ -207,5 +255,69 @@ public class BusTripService {
         long available = seatGeneratorRepository.countByBusTripIdAndStatus(tripId, SeatStatus.AVAILABLE);
         trip.setAvailableSeats((int) available);
         tripRepository.save(trip);
+    }
+
+    @Transactional(readOnly = true)
+    public BusTripFormDto toFormDto(BusTrip trip) {
+        BusTripFormDto form = new BusTripFormDto();
+        form.setId(trip.getId());
+        form.setCompanyId(trip.getBusCompany().getId());
+        form.setDepartureProvince(trip.getDepartureProvince());
+        form.setDepartureStation(trip.getDepartureStation());
+        form.setArrivalProvince(trip.getArrivalProvince());
+        form.setArrivalStation(trip.getArrivalStation());
+        form.setDepartureTime(trip.getDepartureTime());
+        form.setArrivalTime(trip.getArrivalTime());
+        form.setTicketPrice(trip.getTicketPrice());
+        form.setBusType(trip.getBusType());
+        form.setLicensePlate(trip.getLicensePlate());
+        form.setAmenities(trip.getAmenities());
+        form.setStatus(trip.getStatus());
+        return form;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getAdminTripSummaryStats() {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalTrips", tripRepository.count());
+        summary.put("scheduledTrips", tripRepository.countByStatus(TripStatus.SCHEDULED));
+        summary.put("inProgressTrips", tripRepository.countByStatus(TripStatus.IN_PROGRESS));
+        summary.put("completedTrips", tripRepository.countByStatus(TripStatus.COMPLETED));
+        summary.put("cancelledTrips", tripRepository.countByStatus(TripStatus.CANCELLED));
+        summary.put("openAvailableSeats", tripRepository.sumAvailableSeatsByStatus(TripStatus.SCHEDULED));
+        return summary;
+    }
+
+    private void applyTripDetails(BusTrip trip, BusCompany company, BusTripFormDto dto) {
+        trip.setBusCompany(company);
+        trip.setDepartureProvince(dto.getDepartureProvince().trim());
+        trip.setDepartureStation(dto.getDepartureStation().trim());
+        trip.setArrivalProvince(dto.getArrivalProvince().trim());
+        trip.setArrivalStation(dto.getArrivalStation().trim());
+        trip.setRouteName(dto.getDepartureProvince().trim() + " - " + dto.getArrivalProvince().trim());
+        trip.setDepartureTime(dto.getDepartureTime());
+        trip.setArrivalTime(dto.getArrivalTime());
+        trip.setTicketPrice(dto.getTicketPrice());
+        trip.setLicensePlate(dto.getLicensePlate().trim().toUpperCase());
+        String amenities = dto.getAmenities() != null && !dto.getAmenities().isBlank()
+                ? dto.getAmenities().trim()
+                : "Wifi, Nước suối, Điều hòa";
+        trip.setAmenities(amenities);
+    }
+
+    private Sort resolveAdminSort(String sortBy) {
+        if ("PRICE_ASC".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.ASC, "ticketPrice");
+        }
+        if ("PRICE_DESC".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.DESC, "ticketPrice");
+        }
+        if ("SEATS_ASC".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.ASC, "availableSeats");
+        }
+        if ("DEPARTURE_ASC".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.ASC, "departureTime");
+        }
+        return Sort.by(Sort.Direction.DESC, "departureTime");
     }
 }

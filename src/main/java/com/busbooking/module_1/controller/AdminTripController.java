@@ -1,13 +1,15 @@
 package com.busbooking.module_1.controller;
 
+import com.busbooking.common.enums.BusType;
+import com.busbooking.common.enums.TripStatus;
+import com.busbooking.common.exception.BusinessException;
 import com.busbooking.module_1.dto.BusTripFormDto;
+import com.busbooking.module_1.dto.BusTripSearchCriteria;
+import com.busbooking.module_1.model.BusTrip;
 import com.busbooking.module_1.service.BusCompanyService;
 import com.busbooking.module_1.service.BusTripService;
-import com.busbooking.shared.enums.BusType;
-import com.busbooking.shared.enums.TripStatus;
-import com.busbooking.shared.exception.BusinessException;
-import com.busbooking.shared.model.BusTrip;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,8 +32,18 @@ public class AdminTripController {
     }
 
     @GetMapping
-    public String listTrips(Model model) {
-        model.addAttribute("trips", tripService.getAllTrips());
+    public String listTrips(@ModelAttribute("criteria") BusTripSearchCriteria criteria, Model model) {
+        if (criteria != null && criteria.hasAnyFilter()) {
+            Page<BusTrip> tripPage = tripService.searchAdminTrips(criteria);
+            model.addAttribute("trips", tripPage.getContent());
+            model.addAttribute("tripPage", tripPage);
+        } else {
+            model.addAttribute("trips", tripService.getAllTrips());
+        }
+        model.addAttribute("companies", companyService.getAllCompanies());
+        model.addAttribute("tripStatuses", TripStatus.values());
+        model.addAttribute("busTypes", BusType.values());
+        model.addAttribute("tripSummary", tripService.getAdminTripSummaryStats());
         model.addAttribute("activeMenu", "trips");
         return "module_1/trip-list";
     }
@@ -51,22 +63,10 @@ public class AdminTripController {
     @GetMapping({"/edit/{id}", "/{id}/edit"})
     public String showEditForm(@PathVariable Long id, Model model) {
         BusTrip trip = tripService.getTripById(id);
-        BusTripFormDto form = new BusTripFormDto();
-        form.setId(trip.getId());
-        form.setCompanyId(trip.getBusCompany().getId());
-        form.setDepartureProvince(trip.getDepartureProvince());
-        form.setDepartureStation(trip.getDepartureStation());
-        form.setArrivalProvince(trip.getArrivalProvince());
-        form.setArrivalStation(trip.getArrivalStation());
-        form.setDepartureTime(trip.getDepartureTime());
-        form.setArrivalTime(trip.getArrivalTime());
-        form.setTicketPrice(trip.getTicketPrice());
-        form.setBusType(trip.getBusType());
-        form.setLicensePlate(trip.getLicensePlate());
-        form.setAmenities(trip.getAmenities());
-        form.setStatus(trip.getStatus());
+        BusTripFormDto form = tripService.toFormDto(trip);
 
         populateFormReferenceData(model, form, true);
+        model.addAttribute("tripCode", trip.getTripCode());
         return "module_1/trip-form";
     }
 
@@ -97,6 +97,30 @@ public class AdminTripController {
             populateFormReferenceData(model, form, isEdit);
             return "module_1/trip-form";
         }
+    }
+
+    @PostMapping("/{id}/duplicate")
+    public String duplicateTrip(@PathVariable Long id,
+                                @RequestParam(defaultValue = "1") int plusDays,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            BusTrip cloned = tripService.duplicateTrip(id, plusDays);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đã nhân bản thành công chuyến xe mới " + cloned.getTripCode() + " khởi hành sau +" + plusDays + " ngày!");
+        } catch (BusinessException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/admin/trips";
+    }
+
+    @PostMapping("/{id}/status")
+    public String changeTripStatus(@PathVariable Long id,
+                                   @RequestParam TripStatus status,
+                                   RedirectAttributes redirectAttributes) {
+        BusTrip updated = tripService.updateTripStatus(id, status);
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Đã chuyển trạng thái chuyến " + updated.getTripCode() + " sang '" + updated.getStatus().getDisplayName() + "'.");
+        return "redirect:/admin/trips";
     }
 
     @PostMapping({"/cancel/{id}", "/{id}/cancel"})

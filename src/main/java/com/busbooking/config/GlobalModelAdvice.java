@@ -1,8 +1,8 @@
 package com.busbooking.config;
 
 import com.busbooking.module_2.repository.UserAccountRepository;
-import com.busbooking.shared.enums.RoleName;
-import com.busbooking.shared.model.User;
+import com.busbooking.common.enums.RoleName;
+import com.busbooking.module_2.model.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -53,6 +53,6 @@ public class GlobalModelAdvice {
         model.addAttribute("statusCode", 403);
         model.addAttribute("errorTitle", "Truy cập bị từ chối (403 Forbidden)");
         model.addAttribute("errorMessage", "Tài khoản khách hàng không được phép truy cập vào trang Quản trị Admin.");
-        return "shared/error";
+        return "common/error";
     }
 }
