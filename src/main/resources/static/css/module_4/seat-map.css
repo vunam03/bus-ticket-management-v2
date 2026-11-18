@@ -1,0 +1,420 @@
+/* Module 4: So do ghe truc quan, loi di xe khach, 6 trang thai ghe & dong bo thoi gian thuc */
+.seat-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+.seat-legend-box {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.seat-legend-available {
+    background: #ffffff;
+    border: 2px solid #94a3b8;
+}
+
+.seat-legend-selected {
+    background: #2563eb;
+    border: 2px solid #1d4ed8;
+}
+
+.seat-legend-held-me {
+    background: #e0e7ff;
+    border: 2px solid #4f46e5;
+}
+
+.seat-legend-held {
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+}
+
+.seat-legend-booked {
+    background: #e2e8f0;
+    border: 2px solid #94a3b8;
+}
+
+.seat-legend-unavailable {
+    background: #cbd5e1;
+    border: 2px dashed #475569;
+}
+
+.seat-legend-wrapper {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+}
+
+.bus-floor-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 26px rgba(15, 23, 42, 0.05);
+    padding: 1.25rem;
+}
+
+.bus-floor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 2px dashed #e2e8f0;
+}
+
+/* Khoang dau xe: Tai xe - Loi di - Cua len */
+.bus-cabin-cockpit {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border: 1px solid #dbeafe;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.cockpit-driver,
+.cockpit-door {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.cockpit-door {
+    justify-content: flex-end;
+    color: #475569;
+}
+
+.cockpit-driver i {
+    color: #2563eb;
+    font-size: 1rem;
+}
+
+.cockpit-aisle-label {
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    color: #64748b;
+    font-size: 0.72rem;
+}
+
+/* Luoi ghe phan tach ro loi di giua */
+.seat-grid-container {
+    display: grid;
+    row-gap: 0.65rem;
+    column-gap: 0.5rem;
+    position: relative;
+}
+
+.seat-grid-sleeper {
+    grid-template-columns: minmax(56px, 1fr) 12px minmax(56px, 1fr) 12px minmax(56px, 1fr);
+}
+
+.seat-grid-sleeper .seat-btn[data-col="1"] {
+    grid-column: 1;
+}
+
+.seat-grid-sleeper .seat-btn[data-col="2"] {
+    grid-column: 3;
+}
+
+.seat-grid-sleeper .seat-btn[data-col="3"] {
+    grid-column: 5;
+}
+
+.seat-grid-coach {
+    grid-template-columns: minmax(56px, 1fr) minmax(56px, 1fr) 26px minmax(56px, 1fr) minmax(56px, 1fr);
+}
+
+.seat-grid-coach .seat-btn[data-col="1"] {
+    grid-column: 1;
+}
+
+.seat-grid-coach .seat-btn[data-col="2"] {
+    grid-column: 2;
+}
+
+.seat-grid-coach .seat-btn[data-col="3"] {
+    grid-column: 4;
+}
+
+.seat-grid-coach .seat-btn[data-col="4"] {
+    grid-column: 5;
+}
+
+/* Nut ghe va 6 trang thai */
+.seat-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.3rem;
+    min-height: 60px;
+    border-radius: 12px 12px 8px 8px;
+    border: 2px solid #94a3b8;
+    background: #ffffff;
+    color: #0f172a;
+    transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
+    position: relative;
+    user-select: none;
+}
+
+.seat-btn::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    width: 54%;
+    height: 3px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.25;
+}
+
+.seat-btn.seat-available {
+    cursor: pointer;
+    background: #ffffff;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.seat-btn.seat-available:hover:not(:disabled) {
+    border-color: #2563eb;
+    background: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(37, 99, 235, 0.18);
+}
+
+.seat-btn.seat-held-me {
+    cursor: pointer;
+    background: #eef2ff;
+    border-color: #4f46e5;
+    color: #312e81;
+}
+
+.seat-btn.seat-held-me .seat-sub {
+    color: #4338ca;
+}
+
+.seat-btn.seat-held-me:hover:not(:disabled) {
+    background: #e0e7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(79, 70, 229, 0.22);
+}
+
+.seat-btn.seat-selected {
+    background: #2563eb !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.32);
+    transform: translateY(-2px);
+}
+
+.seat-btn.seat-selected .seat-sub {
+    color: #dbeafe !important;
+}
+
+.seat-btn.seat-held {
+    background: repeating-linear-gradient(
+        -45deg,
+        #fef3c7,
+        #fef3c7 6px,
+        #fde68a 6px,
+        #fde68a 12px
+    );
+    border-color: #f59e0b;
+    color: #92400e;
+    cursor: not-allowed;
+}
+
+.seat-btn.seat-booked {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #64748b;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.seat-btn.seat-unavailable {
+    background: #cbd5e1;
+    border: 2px dashed #64748b;
+    color: #334155;
+    cursor: not-allowed;
+    opacity: 0.78;
+}
+
+.seat-btn:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 2px;
+}
+
+.seat-code {
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    margin-top: 4px;
+}
+
+.seat-sub {
+    font-size: 0.69rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Goi y chon ghe & dong bo trang thai */
+.smart-suggest-bar {
+    padding-top: 0.85rem;
+    margin-top: 0.85rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.quick-pick-seat-btn {
+    font-weight: 600;
+}
+
+.seat-sync-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    border: 1px solid #d1fae5;
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.seat-sync-pill .sync-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.seat-sync-pill.is-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.seat-sync-pill.is-error .sync-dot {
+    background: #ef4444;
+}
+
+.floor-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.floor-filter-btn {
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 0.28rem 0.85rem;
+}
+
+.floor-filter-btn.active {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: #ffffff;
+}
+
+.seat-status-counter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 0.79rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Khung phien giu ghe dang hoat dong o sidebar */
+.active-hold-panel {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 12px;
+    padding: 0.85rem;
+}
+
+.text-indigo {
+    color: #3730a3;
+}
+
+.btn-indigo {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+}
+
+.btn-indigo:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+    color: #ffffff;
+}
+
+.selected-seat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin: 0.15rem 0.25rem 0.15rem 0;
+}
+
+.seat-policy-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.25rem;
+}
+
+.seat-policy-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+}
+
+@media (max-width: 576px) {
+    .seat-grid-sleeper {
+        grid-template-columns: minmax(48px, 1fr) 8px minmax(48px, 1fr) 8px minmax(48px, 1fr);
+    }
+
+    .seat-grid-coach {
+        grid-template-columns: minmax(42px, 1fr) minmax(42px, 1fr) 16px minmax(42px, 1fr) minmax(42px, 1fr);
+    }
+
+    .seat-btn {
+        min-height: 54px;
+        padding: 0.4rem 0.2rem;
+    }
+}
