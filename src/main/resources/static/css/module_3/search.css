@@ -1,0 +1,451 @@
+/* Module 3: Trang chu, tim kiem va loc chuyen xe */
+body {
+    font-family: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.hero-search-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #0f766e 55%, #0d9488 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 3.5rem 0 4.5rem;
+}
+
+.hero-search-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 15% 80%, rgba(16, 185, 129, 0.22) 0%, transparent 45%);
+    pointer-events: none;
+}
+
+.hero-search-banner > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.search-box-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.filter-sidebar-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.35rem;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+    border: 1px solid #e2e8f0;
+    position: sticky;
+    top: 84px;
+}
+
+.trip-result-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.35rem 1.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.trip-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15, 118, 110, 0.12);
+    border-color: #99f6e4;
+}
+
+.trip-price-tag {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #dc2626;
+    letter-spacing: -0.02em;
+}
+
+.route-timeline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.route-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0d9488;
+    border: 2px solid #ccfbf1;
+    box-shadow: 0 0 0 2px #0d9488;
+    flex-shrink: 0;
+}
+
+.route-line {
+    flex-grow: 1;
+    height: 2px;
+    border-top: 2px dashed #94a3b8;
+}
+
+.feature-highlight-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.feature-highlight-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+}
+
+.feature-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .border-start-md {
+        border-left: 1px dashed #cbd5e1 !important;
+    }
+}
+
+/* Destination Gallery & Travel Visuals */
+.destination-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+    box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.16);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    background: #0f172a;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.destination-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 34px -10px rgba(13, 148, 136, 0.28);
+}
+
+.destination-card-media {
+    position: relative;
+    height: 195px;
+    overflow: hidden;
+}
+
+.destination-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s ease;
+}
+
+.destination-card:hover img {
+    transform: scale(1.06);
+}
+
+.destination-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+    background: rgba(15, 23, 42, 0.74);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+}
+
+.destination-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.04) 35%, rgba(15, 23, 42, 0.86) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.1rem;
+    color: #ffffff;
+}
+
+.destination-overlay h5 {
+    margin: 0 0 0.2rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.destination-overlay p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.trip-card-thumb {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 140px;
+    background: #0f172a;
+}
+
+.trip-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.trip-result-card:hover .trip-card-thumb img {
+    transform: scale(1.04);
+}
+
+.trip-card-thumb-label {
+    position: absolute;
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: 0.6rem;
+    padding: 0.28rem 0.6rem;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.72);
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trip-detail-banner {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 220px;
+    margin-bottom: 1.5rem;
+    background: #0f172a;
+}
+
+.trip-detail-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.trip-detail-banner-caption {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 30%, rgba(15, 23, 42, 0.84) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.25rem;
+    color: #ffffff;
+}
+
+.summary-banner-thumb {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 126px;
+    margin-bottom: 1rem;
+    background: #0f172a;
+}
+
+.summary-banner-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.summary-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 25%, rgba(15, 23, 42, 0.82) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.75rem 0.9rem;
+    color: #ffffff;
+}
+
+.quick-route-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.38rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.quick-route-pill:hover {
+    background: rgba(255, 255, 255, 0.26);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.amenity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    background: #f0fdfa;
+    border: 1px solid #ccfbf1;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.experience-feature-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.experience-feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.14);
+}
+
+.experience-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+}
+
+
+/* Module 3 - Giao diện danh mục tuyến đường và bảng chi tiết tuyến */
+.route-directory-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.route-directory-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 28px -12px rgba(15, 23, 42, 0.16);
+    border-color: #93c5fd;
+}
+
+.route-card-cover {
+    position: relative;
+    height: 170px;
+    overflow: hidden;
+    background: #0f172a;
+}
+
+.route-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.route-directory-card:hover .route-card-cover img {
+    transform: scale(1.05);
+}
+
+.route-card-badge {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.28rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.84);
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.route-hero-panel {
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border: 1px solid #dbeafe;
+    border-radius: 18px;
+    padding: 1.5rem;
+}
+
+.route-hero-media {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 220px;
+    background: #0f172a;
+}
+
+.route-hero-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.route-hero-chip {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.88);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.route-kpi-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+}
+
+.quick-price-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.quick-price-chip:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
