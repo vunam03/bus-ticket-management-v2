@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Trang chủ - Đặt vé xe khách trực tuyến')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<!-- Hero Search Banner -->
+<section class="hero-search-banner">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-10 mx-auto text-center text-white mb-2">
+                <span class="badge bg-light text-primary fw-semibold px-3 py-2 rounded-pill mb-3 shadow-sm">
+                    <i class="bi bi-stars me-1 text-warning"></i>Hệ thống Đặt vé Xe khách Liên tỉnh 24/7
+                </span>
+                <h1 class="display-5 fw-bold text-white mb-3">
+                    Đặt vé xe khách trực tuyến nhanh chóng &amp; tiện lợi
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    So sánh tuyến đường, chọn ghế trực quan theo thời gian thực và nhận vé điện tử QR chỉ trong 60 giây.
+                </p>
+            </div>
+
+            <div class="col-lg-10 mx-auto">
+                <div class="search-box-card">
+                    <form th:action="@{/trips/search}" th:object="${searchFilter}" method="get">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-secondary">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Điểm đi
+                                </label>
+                                <select th:field="*{departureProvince}" class="form-select form-select-lg fs-6">
+                                    <option value="">Tất cả điểm đi</option>
+                                    <option th:each="p : ${departureProvinces}" th:value="${p}" th:text="${p}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-secondary">
+                                    <i class="bi bi-pin-map-fill text-danger me-1"></i>Điểm đến
+                                </label>
+                                <select th:field="*{arrivalProvince}" class="form-select form-select-lg fs-6">
+                                    <option value="">Tất cả điểm đến</option>
+                                    <option th:each="p : ${arrivalProvinces}" th:value="${p}" th:text="${p}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-secondary">
+                                    <i class="bi bi-calendar-event-fill text-success me-1"></i>Ngày khởi hành
+                                </label>
+                                <input type="date" th:field="*{departureDate}" class="form-control form-control-lg fs-6">
+                            </div>
+                            <div class="col-md-3 d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg fw-bold fs-6 shadow-sm">
+                                    <i class="bi bi-search me-1"></i>Tìm chuyến xe
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Quick Route Suggestions -->
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mt-4">
+                    <span class="text-white-50 small me-1"><i class="bi bi-compass me-1"></i>Tuyến phổ biến:</span>
+                    <a th:href="@{/trips/search(arrivalProvince='Đà Lạt')}" class="quick-route-pill">
+                        <i class="bi bi-flower1"></i>TP.HCM → Đà Lạt
+                    </a>
+                    <a th:href="@{/trips/search(arrivalProvince='Sa Pa')}" class="quick-route-pill">
+                        <i class="bi bi-cloud-sun"></i>Hà Nội → Sa Pa
+                    </a>
+                    <a th:href="@{/trips/search(arrivalProvince='Hải Phòng')}" class="quick-route-pill">
+                        <i class="bi bi-water"></i>Hà Nội → Hải Phòng
+                    </a>
+                    <a th:href="@{/trips/search(arrivalProvince='Đà Nẵng')}" class="quick-route-pill">
+                        <i class="bi bi-brightness-high"></i>Hà Nội → Đà Nẵng
+                    </a>
+                    <a th:href="@{/trips/search(arrivalProvince='Nha Trang')}" class="quick-route-pill">
+                        <i class="bi bi-umbrella"></i>TP.HCM → Nha Trang
+                    </a>
+                    <a th:href="@{/trips/search(arrivalProvince='Huế')}" class="quick-route-pill">
+                        <i class="bi bi-bank"></i>Đà Nẵng → Huế
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Destinations Gallery -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+            <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle mb-2">Khám phá Việt Nam</span>
+                <h3 class="fw-bold mb-1"><i class="bi bi-images text-primary me-2"></i>Điểm Đến Du Lịch Yêu Thích</h3>
+                <p class="text-muted mb-0">Chọn điểm đến mơ ước để xem ngay các chuyến xe khởi hành thuận tiện nhất</p>
+            </div>
+            <a th:href="@{/trips/search}" class="btn btn-outline-primary btn-sm fw-semibold">
+                Khám phá tất cả tuyến <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-4">
+                <a th:href="@{/trips/search(arrivalProvince='Đà Lạt')}" class="destination-card">
+                    <div class="destination-card-media">
+                        <span class="destination-badge"><i class="bi bi-geo-alt-fill me-1"></i>Tây Nguyên</span>
+                        <img th:src="@{/images/destinations/dalat.svg}" alt="Du lịch Đà Lạt">
+                        <div class="destination-overlay">
+                            <h5>Đà Lạt</h5>
+                            <p>Thành phố ngàn hoa &amp; đồi thông mờ sương</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <a th:href="@{/trips/search(arrivalProvince='Sa Pa')}" class="destination-card">
+                    <div class="destination-card-media">
+                        <span class="destination-badge"><i class="bi bi-geo-alt-fill me-1"></i>Tây Bắc</span>
+                        <img th:src="@{/images/destinations/sapa.svg}" alt="Du lịch Sa Pa">
+                        <div class="destination-overlay">
+                            <h5>Sa Pa</h5>
+                            <p>Săn mây đỉnh Fansipan &amp; ruộng bậc thang</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <a th:href="@{/trips/search(arrivalProvince='Đà Nẵng')}" class="destination-card">
+                    <div class="destination-card-media">
+                        <span class="destination-badge"><i class="bi bi-geo-alt-fill me-1"></i>Miền Trung</span>
+                        <img th:src="@{/images/destinations/danang.svg}" alt="Du lịch Đà Nẵng">
+                        <div class="destination-overlay">
+                            <h5>Đà Nẵng</h5>
+                            <p>Cầu Rồng rực sáng &amp; biển Mỹ Khê thơ mộng</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <a th:href="@{/trips/search(arrivalProvince='Nha Trang')}" class="destination-card">
+                    <div class="destination-card-media">
+                        <span class="destination-badge"><i class="bi bi-geo-alt-fill me-1"></i>Duyên Hải</span>
+                        <img th:src="@{/images/destinations/nhatrang.svg}" alt="Du lịch Nha Trang">
+                        <div class="destination-overlay">
+                            <h5>Nha Trang</h5>
+                            <p>Vịnh biển ngọc bích &amp; nắng vàng rực rỡ</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <a th:href="@{/trips/search(arrivalProvince='Huế')}" class="destination-card">
+                    <div class="destination-card-media">
+                        <span class="destination-badge"><i class="bi bi-geo-alt-fill me-1"></i>Di Sản</span>
+                        <img th:src="@{/images/destinations/hue.svg}" alt="Du lịch Huế">
+                        <div class="destination-overlay">
+                            <h5>Huế</h5>
+                            <p>Kinh thành cổ kính &amp; dòng Hương Giang êm đềm</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <a th:href="@{/trips/search(arrivalProvince='Hải Phòng')}" class="destination-card">
+                    <div class="destination-card-media">
+                        <span class="destination-badge"><i class="bi bi-geo-alt-fill me-1"></i>Đất Cảng</span>
+                        <img th:src="@{/images/destinations/haiphong.svg}" alt="Du lịch Hải Phòng">
+                        <div class="destination-overlay">
+                            <h5>Hải Phòng</h5>
+                            <p>Thành phố hoa phượng đỏ &amp; cửa ngõ vịnh biển</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Trips Section -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-fire text-danger me-2"></i>Chuyến Xe Nổi Bật Khởi Hành Sớm</h3>
+                <p class="text-muted mb-0">Những tuyến đường được hành khách lựa chọn nhiều nhất trong tuần</p>
+            </div>
+            <a th:href="@{/trips/search}" class="btn btn-outline-primary btn-sm fw-semibold">
+                Xem tất cả chuyến xe <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4" th:if="${featuredTrips != null and !#lists.isEmpty(featuredTrips)}">
+            <div class="col-lg-6" th:each="t : ${featuredTrips}">
+                <div class="trip-result-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="trip-card-thumb mb-3">
+                            <img th:src="@{${t.destinationImageUrl}}" th:alt="${t.arrivalProvince}">
+                            <span class="trip-card-thumb-label">
+                                <i class="bi bi-geo-alt-fill text-warning me-1"></i>
+                                <span th:text="${t.destinationHighlight}">Cảnh đẹp điểm đến</span>
+                            </span>
+                        </div>
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="badge bg-primary" th:text="${t.busCompany.companyName}">Nhà xe</span>
+                                <span class="badge bg-light text-dark border" th:text="${t.busType.displayName}">Loại xe</span>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle"
+                                  th:text="'Còn ' + ${t.availableSeats} + '/' + ${t.totalSeats} + ' ghế'">Còn 20 ghế</span>
+                        </div>
+
+                        <h5 class="fw-bold mb-3">
+                            <span th:text="${t.departureProvince}">Hà Nội</span>
+                            <i class="bi bi-arrow-right mx-2 text-primary"></i>
+                            <span th:text="${t.arrivalProvince}">Sa Pa</span>
+                        </h5>
+
+                        <div class="row g-2 bg-light rounded-3 p-3 mb-3 small">
+                            <div class="col-6">
+                                <div class="text-muted">Khởi hành</div>
+                                <div class="fw-bold text-dark" th:text="${#temporals.format(t.departureTime, 'HH:mm - dd/MM/yyyy')}">07:30</div>
+                                <div class="text-secondary text-truncate" th:text="${t.departureStation}">Bến đi</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-muted">Dự kiến đến</div>
+                                <div class="fw-bold text-dark" th:text="${#temporals.format(t.arrivalTime, 'HH:mm - dd/MM/yyyy')}">13:00</div>
+                                <div class="text-secondary text-truncate" th:text="${t.arrivalStation}">Bến đến</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" th:if="${t.amenities != null and !#strings.isEmpty(t.amenities)}">
+                            <span class="amenity-chip">
+                                <i class="bi bi-stars"></i>
+                                <span th:text="${t.amenities}">Wifi, Nước suối, Điều hòa</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <div>
+                            <span class="small text-muted d-block">Giá vé từ</span>
+                            <span class="trip-price-tag" th:text="${#numbers.formatDecimal(t.ticketPrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">320,000 đ</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/trips/{id}(id=${t.id})}" class="btn btn-outline-secondary btn-sm fw-semibold px-3 d-flex align-items-center">
+                                Chi tiết
+                            </a>
+                            <a th:href="@{/booking/trip/{id}/seats(id=${t.id})}" class="btn btn-primary fw-semibold px-3">
+                                <i class="bi bi-grid-3x3-gap me-1"></i>Chọn ghế
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-light border text-center py-4" th:if="${featuredTrips == null or #lists.isEmpty(featuredTrips)}">
+            Hiện chưa có chuyến xe nổi bật nào đang mở bán. Vui lòng quay lại sau hoặc tìm kiếm tuyến khác.
+        </div>
+    </div>
+</section>
+
+<!-- Travel Service Experience & Fleet Highlights -->
+<section class="py-5 flex-grow-1">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-1">Trải Nghiệm Dịch Vụ Đặt Vé &amp; Đội Xe Hạng Sang</h3>
+            <p class="text-muted mb-0">Mọi hành trình đều được chuẩn bị chỉn chu từ khâu chọn chỗ đến khi xuống bến</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="experience-feature-card">
+                    <div class="experience-icon-wrap bg-primary-subtle text-primary">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Chọn ghế trực quan &amp; Giữ chỗ 10 phút</h5>
+                    <p class="text-muted small mb-0">
+                        Xem sơ đồ ghế tầng dưới - tầng trên theo thời gian thực, khóa ghế độc quyền 10 phút chống đặt trùng trong khi thanh toán.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="experience-feature-card">
+                    <div class="experience-icon-wrap bg-success-subtle text-success">
+                        <i class="bi bi-qr-code-scan"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Thanh toán đa phương thức &amp; Vé QR</h5>
+                    <p class="text-muted small mb-0">
+                        Hỗ trợ VietQR, ví điện tử, thẻ ngân hàng hoặc tiền mặt tại quầy. Nhận ngay mã vé QR và tệp PDF sau khi xác nhận.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="experience-feature-card">
+                    <div class="experience-icon-wrap bg-warning-subtle text-warning">
+                        <i class="bi bi-bus-front-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Limousine VIP &amp; Giường nằm đời mới</h5>
+                    <p class="text-muted small mb-0">
+                        Trang bị Wifi tốc độ cao, cổng sạc USB từng khoang, rèm che riêng tư, nước suối và khăn lạnh miễn phí suốt tuyến.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partner Bus Companies -->
+        <div class="pt-4 border-top" th:if="${companies != null and !#lists.isEmpty(companies)}">
+            <h5 class="fw-bold mb-3"><i class="bi bi-building-check text-primary me-2"></i>Đối tác Nhà xe Uy tín</h5>
+            <div class="row g-3">
+                <div class="col-sm-6 col-md-4 col-lg-3" th:each="c : ${companies}">
+                    <div class="card border-0 shadow-sm h-100 p-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-primary-subtle text-primary p-2 rounded-3"><i class="bi bi-bus-front"></i></span>
+                            <h6 class="fw-bold mb-0" th:text="${c.companyName}">Nhà xe</h6>
+                        </div>
+                        <p class="small text-muted mb-1"><i class="bi bi-telephone me-1"></i><span th:text="${c.hotline}">1900 1000</span></p>
+                        <p class="small text-secondary mb-0 text-truncate" th:text="${c.address}">Địa chỉ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_3/search-filter.js')}"></div>
+</body>
+</html>

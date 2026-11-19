@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Cổng khám phá tuyến xe liên tỉnh')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<section class="hero-search-banner">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-10 mx-auto text-center text-white">
+                <span class="badge bg-light text-primary fw-semibold px-3 py-2 rounded-pill mb-3 shadow-sm">
+                    <i class="bi bi-signpost-split-fill me-1 text-warning"></i>Mạng lưới Tuyến Xe Khách Toàn Quốc
+                </span>
+                <h1 class="display-6 fw-bold text-white mb-3">
+                    Khám phá lịch trình &amp; giá vé các tuyến liên tỉnh trọng điểm
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Tra cứu nhanh theo tuyến đường, khung giờ khởi hành, loại xe giường nằm - limousine và đặt chỗ tức thì.
+                </p>
+            </div>
+
+            <div class="col-lg-10 mx-auto">
+                <div class="search-box-card">
+                    <form id="indexQuickSearchForm" th:action="@{/search}" th:object="${searchFilter}" method="get">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Điểm đi</label>
+                                <select id="depProvinceSelect" th:field="*{departureProvince}" class="form-select">
+                                    <option value="">Tất cả điểm xuất phát</option>
+                                    <option th:each="p : ${departureProvinces}" th:value="${p}" th:text="${p}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-grid">
+                                <button type="button" id="swapProvinceBtn" class="btn btn-outline-primary" title="Đảo chiều đi và đến">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Điểm đến</label>
+                                <select id="arrProvinceSelect" th:field="*{arrivalProvince}" class="form-select">
+                                    <option value="">Tất cả điểm đến</option>
+                                    <option th:each="p : ${arrivalProvinces}" th:value="${p}" th:text="${p}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-grid">
+                                <button type="submit" class="btn btn-primary fw-bold">
+                                    <i class="bi bi-search me-1"></i>Tìm chuyến ngay
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="input-group input-group-sm" style="max-width: 380px;">
+                            <span class="input-group-text bg-white"><i class="bi bi-lightning-charge text-warning"></i></span>
+                            <input type="text" id="quickRouteFilterInput" class="form-control"
+                                   placeholder="Lọc nhanh tên tuyến, tỉnh thành hoặc điểm nhấn...">
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a th:href="@{/trips/search(sortBy='PRICE_ASC')}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                <i class="bi bi-tags me-1"></i>Giá rẻ nhất
+                            </a>
+                            <a th:href="@{/trips/search(sortBy='SEATS_DESC')}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                <i class="bi bi-grid-3x3-gap me-1"></i>Còn nhiều ghế
+                            </a>
+                            <a th:href="@{/routes}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="bi bi-table me-1"></i>So sánh bảng giờ chạy
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5 flex-grow-1">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+        <div>
+            <span class="text-primary fw-semibold small text-uppercase">Hành lang vận tải trọng điểm</span>
+            <h3 class="fw-bold mb-1">Các tuyến đường đang khai thác</h3>
+            <p class="text-muted mb-0">Chọn tuyến để xem bảng giờ xuất bến, số ghế trống và mức giá khởi điểm tốt nhất.</p>
+        </div>
+        <a th:href="@{/routes/detail}" class="btn btn-outline-primary btn-sm fw-semibold">
+            Xem bảng so sánh tuyến <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row g-4 mb-5" id="routeDirectoryGrid">
+        <div class="col-md-6 col-lg-4 route-directory-item" th:each="r : ${popularRoutes}">
+            <div class="route-directory-card h-100">
+                <div class="route-card-cover">
+                    <img th:src="@{${r.imageUrl}}" th:alt="${r.routeName}">
+                    <span class="route-card-badge" th:text="${r.highlight}">Điểm đến nổi bật</span>
+                </div>
+                <div class="p-3 d-flex flex-column flex-grow-1">
+                    <h5 class="fw-bold mb-2 route-title" th:text="${r.routeName}">TP.HCM → Đà Lạt</h5>
+                    <div class="d-flex flex-wrap gap-3 small text-muted mb-3">
+                        <span><i class="bi bi-bus-front text-primary me-1"></i><strong th:text="${r.activeTripCount}">3</strong> chuyến/ngày</span>
+                        <span><i class="bi bi-clock text-success me-1"></i><span th:text="${r.estimatedDuration}">7 giờ</span></span>
+                        <span><i class="bi bi-person-check text-info me-1"></i><span th:text="${r.totalAvailableSeats}">40</span> ghế trống</span>
+                    </div>
+                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">Giá từ</div>
+                            <div class="fw-bold text-danger fs-6" th:text="${r.formattedMinPrice}">280,000 đ</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/routes/detail(from=${r.departureProvince},to=${r.arrivalProvince})}"
+                               class="btn btn-sm btn-outline-primary">Lịch chạy</a>
+                            <a th:href="@{/trips/search(departureProvince=${r.departureProvince},arrivalProvince=${r.arrivalProvince})}"
+                               class="btn btn-sm btn-primary">Đặt vé</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">Chuyến xe khởi hành sắp tới</h4>
+            <p class="text-muted mb-0">Cập nhật liên tục tình trạng ghế trống theo thời gian thực.</p>
+        </div>
+        <a th:href="@{/trips/search}" class="btn btn-link text-decoration-none fw-semibold">
+            Tìm tất cả chuyến <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-3" th:each="trip : ${featuredTrips}">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary-subtle text-primary" th:text="${trip.busCompany.companyName}">Nhà xe</span>
+                        <span class="small text-muted font-monospace" th:text="${trip.tripCode}">TRP-001</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">
+                        <span th:text="${trip.departureProvince}">Hà Nội</span> →
+                        <span th:text="${trip.arrivalProvince}">Sa Pa</span>
+                    </h6>
+                    <div class="small text-muted mb-2" th:text="${trip.busType.displayName}">Giường nằm 40 chỗ</div>
+                    <div class="small mb-3">
+                        <i class="bi bi-clock me-1 text-primary"></i>
+                        <strong th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}">07:30</strong>
+                    </div>
+                    <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
+                        <strong class="text-danger" th:text="${#numbers.formatDecimal(trip.ticketPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">320,000 đ</strong>
+                        <a th:href="@{/booking/trip/{id}/seats(id=${trip.id})}" class="btn btn-sm btn-primary">Chọn ghế</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_3/search-filter.js')}"></div>
+</body>
+</html>

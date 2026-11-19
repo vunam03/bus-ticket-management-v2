@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Tìm kiếm &amp; Lọc chuyến xe')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-search text-primary me-2"></i>Tìm kiếm &amp; Lọc Chuyến xe</h3>
+            <p class="text-muted mb-0">Tìm thấy <strong class="text-primary" th:text="${resultCount}">0</strong> chuyến xe phù hợp với tiêu chí của bạn</p>
+        </div>
+    </div>
+
+    <form id="tripSearchFilterForm" th:action="@{/trips/search}" th:object="${searchFilter}" method="get">
+        <!-- Thanh tìm kiếm chính -->
+        <div class="search-box-card mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Điểm đi</label>
+                    <select th:field="*{departureProvince}" class="form-select">
+                        <option value="">Tất cả điểm đi</option>
+                        <option th:each="p : ${departureProvinces}" th:value="${p}" th:text="${p}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Điểm đến</label>
+                    <select th:field="*{arrivalProvince}" class="form-select">
+                        <option value="">Tất cả điểm đến</option>
+                        <option th:each="p : ${arrivalProvinces}" th:value="${p}" th:text="${p}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Ngày khởi hành</label>
+                    <input type="date" th:field="*{departureDate}" class="form-control">
+                </div>
+                <div class="col-md-3 d-grid">
+                    <button type="submit" class="btn btn-primary fw-semibold py-2">
+                        <i class="bi bi-search me-1"></i>Áp dụng tìm kiếm
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Bộ lọc bên trái -->
+            <div class="col-lg-3">
+                <div class="filter-sidebar-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-funnel-fill text-primary me-1"></i>Bộ lọc nâng cao</h6>
+                        <button type="button" id="resetSearchFilterBtn" class="btn btn-link btn-sm text-decoration-none p-0">Đặt lại</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Sắp xếp theo</label>
+                        <select th:field="*{sortBy}" class="form-select form-select-sm auto-submit-filter">
+                            <option value="TIME_ASC">Giờ chạy sớm nhất</option>
+                            <option value="TIME_DESC">Giờ chạy muộn nhất</option>
+                            <option value="PRICE_ASC">Giá vé thấp đến cao</option>
+                            <option value="PRICE_DESC">Giá vé cao xuống thấp</option>
+                            <option value="SEATS_DESC">Nhiều ghế trống nhất</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Nhà xe</label>
+                        <select th:field="*{companyId}" class="form-select form-select-sm auto-submit-filter">
+                            <option value="">Tất cả nhà xe</option>
+                            <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.companyName}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Loại xe</label>
+                        <select th:field="*{busType}" class="form-select form-select-sm auto-submit-filter">
+                            <option value="">Tất cả loại xe</option>
+                            <option th:each="bt : ${busTypes}" th:value="${bt}" th:text="${bt.displayName}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Khung giờ xuất bến</label>
+                        <select th:field="*{timeSlot}" class="form-select form-select-sm auto-submit-filter">
+                            <option value="">Mọi khung giờ</option>
+                            <option value="MORNING">Buổi sáng (05:00 - 11:59)</option>
+                            <option value="AFTERNOON">Buổi chiều (12:00 - 17:59)</option>
+                            <option value="EVENING">Buổi tối (18:00 - 21:59)</option>
+                            <option value="NIGHT">Ban đêm (22:00 - 04:59)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Khoảng giá vé (VNĐ)</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" th:field="*{minPrice}" class="form-control form-control-sm" placeholder="Từ (đ)" step="10000">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" th:field="*{maxPrice}" class="form-control form-control-sm" placeholder="Đến (đ)" step="10000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
+                        <i class="bi bi-check2-circle me-1"></i>Lọc kết quả
+                    </button>
+                </div>
+            </div>
+
+            <!-- Danh sách chuyến xe bên phải -->
+            <div class="col-lg-9">
+                <div th:if="${#lists.isEmpty(trips)}" class="card border-0 shadow-sm p-5 text-center">
+                    <i class="bi bi-bus-front fs-1 text-muted mb-3"></i>
+                    <h5 class="fw-bold">Không tìm thấy chuyến xe nào khớp với bộ lọc</h5>
+                    <p class="text-muted">Hãy thử đổi ngày khởi hành hoặc nhấn "Đặt lại" bộ lọc để xem toàn bộ chuyến xe đang mở bán.</p>
+                    <div>
+                        <a th:href="@{/trips/search}" class="btn btn-primary">Xem tất cả chuyến xe</a>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="trip-result-card" th:each="t : ${trips}">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-3">
+                                <div class="trip-card-thumb">
+                                    <img th:src="@{${t.destinationImageUrl}}" th:alt="${t.arrivalProvince}">
+                                    <span class="trip-card-thumb-label" th:text="${t.destinationHighlight}">Điểm đến hấp dẫn</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <span class="badge bg-primary" th:text="${t.busCompany.companyName}">Nhà xe</span>
+                                    <span class="badge bg-light text-dark border" th:text="${t.busType.displayName}">Loại xe</span>
+                                    <span class="small text-muted font-monospace" th:text="'Mã: ' + ${t.tripCode}">TRP-001</span>
+                                    <span class="small text-muted"><i class="bi bi-card-heading me-1"></i><span th:text="${t.licensePlate}">51B-123.45</span></span>
+                                </div>
+
+                                <h5 class="fw-bold mb-2">
+                                    <span th:text="${t.departureProvince}">Hà Nội</span>
+                                    <i class="bi bi-arrow-right mx-2 text-primary"></i>
+                                    <span th:text="${t.arrivalProvince}">Đà Nẵng</span>
+                                </h5>
+
+                                <div class="row g-2 bg-light rounded-3 p-2 mt-2">
+                                    <div class="col-sm-5">
+                                        <div class="small text-muted">Khởi hành</div>
+                                        <div class="fw-bold text-dark" th:text="${#temporals.format(t.departureTime, 'HH:mm - dd/MM/yyyy')}">08:00</div>
+                                        <div class="small text-secondary" th:text="${t.departureStation}">Bến xe đi</div>
+                                    </div>
+                                    <div class="col-sm-2 d-flex align-items-center justify-content-center">
+                                        <div class="route-timeline w-100 px-1">
+                                            <span class="route-dot"></span>
+                                            <span class="route-line"></span>
+                                            <span class="route-dot"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="small text-muted">Dự kiến đến</div>
+                                        <div class="fw-bold text-dark" th:text="${#temporals.format(t.arrivalTime, 'HH:mm - dd/MM/yyyy')}">14:00</div>
+                                        <div class="small text-secondary" th:text="${t.arrivalStation}">Bến xe đến</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2" th:if="${t.amenities != null and !#strings.isEmpty(t.amenities)}">
+                                    <span class="amenity-chip">
+                                        <i class="bi bi-stars"></i>
+                                        <span th:text="${t.amenities}">Wifi, Nước suối, Điều hòa</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 text-md-end border-start-md ps-md-3">
+                                <div class="trip-price-tag mb-1" th:text="${#numbers.formatDecimal(t.ticketPrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">350,000 đ</div>
+                                <div class="mb-3">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                        <i class="bi bi-check-circle me-1"></i>Còn <span th:text="${t.availableSeats}">25</span>/<span th:text="${t.totalSeats}">40</span> ghế trống
+                                    </span>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <a th:href="@{/booking/trip/{id}/seats(id=${t.id})}" class="btn btn-primary fw-semibold">
+                                        <i class="bi bi-grid-3x3-gap me-1"></i>Chọn ghế ngay
+                                    </a>
+                                    <a th:href="@{/trips/{id}(id=${t.id})}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-eye me-1"></i>Xem chi tiết chuyến
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_3/search-filter.js')}"></div>
+</body>
+</html>
