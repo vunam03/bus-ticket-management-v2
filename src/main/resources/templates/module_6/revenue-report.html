@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Báo cáo Doanh thu &amp; Xuất Excel - Admin')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <div class="col-lg-2 px-0">
+            <aside th:replace="~{common/fragments :: adminSidebar('reports')}"></aside>
+        </div>
+
+        <main class="col-lg-10 py-4 px-4">
+            <div th:replace="~{common/fragments :: alerts}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1"><i class="bi bi-file-earmark-bar-graph-fill text-primary me-2"></i>Báo cáo Doanh thu Chi tiết &amp; Xuất Excel</h3>
+                    <p class="text-muted mb-0">Lọc doanh thu theo khoảng ngày, nhà xe, tuyến đường và kết xuất sổ tính Excel (.xlsx) 3 trang tính</p>
+                </div>
+                <a th:href="@{/admin/reports/export(startDate=${filter.startDate}, endDate=${filter.endDate}, year=${filter.year}, companyId=${filter.companyId}, routeName=${filter.routeName})}"
+                   class="btn btn-success fw-bold">
+                    <i class="bi bi-file-earmark-excel-fill me-2"></i>Tải Báo cáo Excel (.xlsx)
+                </a>
+            </div>
+
+            <!-- Thanh bộ lọc thời gian -->
+            <div class="report-filter-bar mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <span class="fw-bold small text-uppercase text-muted"><i class="bi bi-sliders me-1"></i>Bộ lọc Thời gian &amp; Tiêu chí Báo cáo</span>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="quick-range-btn" onclick="applyQuickDateFilter('TODAY')">Hôm nay</button>
+                        <button type="button" class="quick-range-btn" onclick="applyQuickDateFilter('LAST_7_DAYS')">7 ngày qua</button>
+                        <button type="button" class="quick-range-btn" onclick="applyQuickDateFilter('THIS_MONTH')">Tháng này</button>
+                        <button type="button" class="quick-range-btn" onclick="applyQuickDateFilter('THIS_YEAR')">Năm nay</button>
+                    </div>
+                </div>
+
+                <form id="revenueFilterForm" th:action="@{/admin/reports/revenue}" th:object="${filter}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold">Từ ngày</label>
+                        <input type="date" id="startDateInput" th:field="*{startDate}" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold">Đến ngày</label>
+                        <input type="date" id="endDateInput" th:field="*{endDate}" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold">Năm tổng hợp</label>
+                        <select th:field="*{year}" class="form-select form-select-sm">
+                            <option th:each="y : ${availableYears}" th:value="${y}" th:text="${'Năm ' + y}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Nhà xe</label>
+                        <select th:field="*{companyId}" class="form-select form-select-sm">
+                            <option value="">Tất cả nhà xe</option>
+                            <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.companyName}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Tuyến đường</label>
+                        <select th:field="*{routeName}" class="form-select form-select-sm">
+                            <option value="">Tất cả tuyến đường</option>
+                            <option th:each="r : ${routes}" th:value="${r}" th:text="${r}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                        <a th:href="@{/admin/reports/revenue}" class="btn btn-sm btn-outline-secondary">Đặt lại mặc định</a>
+                        <button type="submit" class="btn btn-sm btn-primary px-4 fw-semibold">
+                            <i class="bi bi-funnel-fill me-1"></i>Phân tích Dữ liệu
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Thẻ tổng hợp -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3 bg-primary text-white">
+                        <div class="small text-uppercase opacity-75">Doanh thu trong kỳ đã lọc</div>
+                        <div class="fs-3 fw-bold my-1"
+                             th:text="${periodRevenue != null ? #numbers.formatDecimal(periodRevenue, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</div>
+                        <div class="small opacity-75"
+                             th:text="${filter.startDate != null and filter.endDate != null ? 'Kỳ: ' + #temporals.format(filter.startDate, 'dd/MM/yyyy') + ' → ' + #temporals.format(filter.endDate, 'dd/MM/yyyy') : 'Toàn bộ kỳ báo cáo'}"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3">
+                        <div class="small text-uppercase text-muted fw-semibold">Tổng số vé thực thu trong kỳ</div>
+                        <div class="fs-3 fw-bold text-success my-1" th:text="${(paidTicketCount != null ? paidTicketCount : 0) + ' vé'}">0 vé</div>
+                        <div class="small text-muted">Chỉ tính vé CONFIRMED &amp; PAID</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3">
+                        <div class="small text-uppercase text-muted fw-semibold">Giá trị vé bình quân</div>
+                        <div class="fs-3 fw-bold text-primary my-1"
+                             th:text="${averageTicketPrice != null ? #numbers.formatDecimal(averageTicketPrice, 0, 'COMMA', 0, 'POINT') + ' ₫/vé' : '0 ₫/vé'}">0 ₫</div>
+                        <div class="small text-muted">Doanh thu trung bình mỗi hành khách</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng doanh thu theo ngày & 12 tháng -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-calendar-range text-primary me-2"></i>Chi tiết Doanh thu Theo Ngày</h5>
+                        <div class="table-responsive" style="max-height: 440px; overflow-y: auto;">
+                            <table class="table table-sm table-hover align-middle report-table mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th class="text-center">Chuyến</th>
+                                    <th class="text-center">Vé bán</th>
+                                    <th class="text-center">Vé hủy</th>
+                                    <th class="text-end">Doanh thu</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="d : ${dailyStats}" th:classappend="${d.ticketCount > 0 ? 'table-success bg-opacity-10' : ''}">
+                                    <td class="fw-semibold" th:text="${d.label}">14/11/2026</td>
+                                    <td class="text-center" th:text="${d.tripCount}">0</td>
+                                    <td class="text-center"><span class="badge bg-primary" th:text="${d.ticketCount}">0</span></td>
+                                    <td class="text-center text-danger" th:text="${d.cancelledCount}">0</td>
+                                    <td class="text-end fw-bold text-dark" th:text="${d.formattedRevenue}">0 ₫</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-calendar3 text-success me-2"></i>Tổng hợp 12 Tháng Năm <span th:text="${filter.year}">2026</span></h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle report-table mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Tháng</th>
+                                    <th class="text-center">Số chuyến</th>
+                                    <th class="text-center">Vé đã thu</th>
+                                    <th class="text-center">Vé hủy</th>
+                                    <th class="text-end">Doanh thu</th>
+                                    <th class="text-end">Tăng trưởng</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="m : ${monthlyStats}">
+                                    <td class="fw-semibold" th:text="${m.monthLabel}">Tháng 1</td>
+                                    <td class="text-center" th:text="${m.totalTrips}">0</td>
+                                    <td class="text-center fw-bold text-primary" th:text="${m.paidTickets}">0</td>
+                                    <td class="text-center text-danger" th:text="${m.cancelledTickets}">0</td>
+                                    <td class="text-end fw-bold text-success" th:text="${m.formattedRevenue}">0 ₫</td>
+                                    <td class="text-end">
+                                        <span class="badge"
+                                              th:classappend="${m.growthRatePercent > 0 ? 'bg-success-subtle text-success' : (m.growthRatePercent < 0 ? 'bg-danger-subtle text-danger' : 'bg-light text-muted')}"
+                                              th:text="${(m.growthRatePercent > 0 ? '+' : '') + m.growthRatePercent + '%'}">0%</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_6/report-filter.js')}"></div>
+</body>
+</html>

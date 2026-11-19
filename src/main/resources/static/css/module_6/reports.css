@@ -1,0 +1,36 @@
+/* Module 6: Bao cao Doanh thu & Loc du lieu */
+.report-filter-bar {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.quick-range-btn {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    border-radius: 999px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.quick-range-btn:hover,
+.quick-range-btn.active {
+    background: #0d9488;
+    border-color: #0d9488;
+    color: #ffffff;
+}
+
+.report-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid #e2e8f0;
+}
