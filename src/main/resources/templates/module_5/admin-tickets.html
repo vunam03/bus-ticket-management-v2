@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Quản lý Danh sách Vé - Admin')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <div class="col-lg-2 px-0">
+            <aside th:replace="~{common/fragments :: adminSidebar('tickets')}"></aside>
+        </div>
+
+        <main class="col-lg-10 py-4 px-4">
+            <div th:replace="~{common/fragments :: alerts}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1"><i class="bi bi-ticket-detailed-fill text-primary me-2"></i>Quản lý Toàn bộ Vé xe</h3>
+                    <p class="text-muted mb-0">Tra cứu vé của khách hàng, xác nhận thu tiền mặt tại quầy hoặc hỗ trợ hủy vé</p>
+                </div>
+                <a th:href="@{/admin/payments}" class="btn btn-outline-primary">
+                    <i class="bi bi-credit-card me-1"></i>Xem Lịch sử Giao dịch
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Mã vé</th>
+                            <th>Hành khách</th>
+                            <th>Chuyến xe &amp; Tuyến</th>
+                            <th>Số ghế</th>
+                            <th>Giá vé</th>
+                            <th>Trạng thái vé</th>
+                            <th>Thanh toán</th>
+                            <th class="text-end pe-3">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(tickets)}">
+                            <td colspan="8" class="text-center py-5 text-muted">Chưa có vé nào được đặt trong hệ thống.</td>
+                        </tr>
+                        <tr th:each="tk : ${tickets}">
+                            <td class="ps-3 font-monospace fw-bold text-primary" th:text="${tk.ticketCode}">TK-001</td>
+                            <td>
+                                <div class="fw-semibold" th:text="${tk.passengerName}"></div>
+                                <small class="text-muted" th:text="${tk.passengerPhone}"></small>
+                            </td>
+                            <td>
+                                <div class="fw-semibold" th:text="${tk.busTrip.departureProvince + ' → ' + tk.busTrip.arrivalProvince}"></div>
+                                <small class="text-muted" th:text="${tk.busTrip.busCompany.companyName + ' • ' + #temporals.format(tk.busTrip.departureTime, 'HH:mm dd/MM/yyyy')}"></small>
+                            </td>
+                            <td><span class="badge bg-primary-subtle text-primary" th:text="${tk.seat.seatNumber}">A01</span></td>
+                            <td class="fw-bold text-danger" th:text="${#numbers.formatDecimal(tk.finalPrice, 0, 'COMMA', 0, 'POINT') + ' đ'}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${tk.status.name() == 'CONFIRMED' ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${tk.status.displayName}"></span>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${tk.paymentStatus.name() == 'PAID' ? 'bg-primary' : (tk.paymentStatus.name() == 'REFUNDED' ? 'bg-info text-dark' : 'bg-warning text-dark')}"
+                                      th:text="${tk.paymentStatus.displayName}"></span>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <a th:href="@{/tickets/{id}(id=${tk.id})}" class="btn btn-sm btn-outline-secondary" title="Xem chi tiết &amp; QR">
+                                        <i class="bi bi-qr-code"></i>
+                                    </a>
+                                    <form th:if="${tk.status.name() == 'CONFIRMED' and tk.paymentStatus.name() == 'UNPAID'}"
+                                          th:action="@{/admin/tickets/{id}/confirm-payment(id=${tk.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Xác nhận đã thu tiền mặt">
+                                            <i class="bi bi-check2-circle me-1"></i>Thu tiền
+                                        </button>
+                                    </form>
+                                    <form th:if="${tk.status.name() == 'CONFIRMED'}"
+                                          th:action="@{/admin/tickets/{id}/cancel(id=${tk.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                data-confirm="Admin xác nhận hủy vé này và mở trống ghế?" title="Hủy vé">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts(null)}"></div>
+</body>
+</html>

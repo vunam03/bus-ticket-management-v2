@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Đặt vé thành công - Thẻ lên xe điện tử')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <div class="booking-success-hero mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="booking-success-icon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+                <div>
+                    <span class="badge bg-success-subtle text-success mb-1">Xác nhận đặt chỗ hoàn tất</span>
+                    <h3 class="fw-bold mb-1">Cảm ơn bạn đã đặt vé tại BusBooking VN!</h3>
+                    <p class="text-muted mb-0">
+                        Hành trình: <strong th:text="${primaryTicket.busTrip.departureProvince + ' → ' + primaryTicket.busTrip.arrivalProvince}"></strong>
+                        &bull; Nhà xe: <strong th:text="${primaryTicket.busTrip.busCompany.companyName}"></strong>
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a th:href="@{/tickets/my-tickets}" class="btn btn-outline-primary fw-semibold">
+                    <i class="bi bi-ticket-perforated me-1"></i>Xem toàn bộ vé của tôi
+                </a>
+                <a th:href="@{/trips/search}" class="btn btn-primary fw-semibold">
+                    <i class="bi bi-plus-circle me-1"></i>Đặt chuyến khác
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex flex-column gap-3">
+                <div class="ticket-boarding-pass" th:each="tk : ${tickets}">
+                    <div class="ticket-boarding-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <div class="small opacity-75">THẺ LÊN XE ĐIỆN TỬ</div>
+                            <h5 class="fw-bold mb-0" th:text="${tk.busTrip.routeName}">TP.HCM → Đà Lạt</h5>
+                        </div>
+                        <div class="text-end">
+                            <span class="small opacity-75 d-block">MÃ VÉ</span>
+                            <span class="fs-5 fw-bold font-monospace" th:text="${tk.ticketCode}">VEX-001</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-8">
+                                <div class="row g-3 small">
+                                    <div class="col-sm-6">
+                                        <span class="text-muted d-block">Hành khách</span>
+                                        <strong class="fs-6" th:text="${tk.passengerName}">Nguyễn Văn A</strong>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-muted d-block">Số ghế / Vị trí</span>
+                                        <span class="badge bg-primary fs-6" th:text="'Ghế ' + ${tk.seat.seatNumber}">Ghế A01</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-muted d-block">Giờ khởi hành</span>
+                                        <strong class="text-primary" th:text="${#temporals.format(tk.busTrip.departureTime, 'HH:mm - dd/MM/yyyy')}">08:00</strong>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-muted d-block">Trạng thái thanh toán</span>
+                                        <span class="badge bg-success-subtle text-success" th:text="${tk.paymentStatus.displayName}">Đã thanh toán</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-muted d-block">Bến đón khách</span>
+                                        <strong th:text="${tk.busTrip.departureStation}">Bến xe Miền Đông</strong>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <span class="text-muted d-block">Tổng tiền</span>
+                                        <strong class="text-danger fs-6" th:text="${#numbers.formatDecimal(tk.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}">350,000 đ</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 d-grid gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary copy-ticket-code-btn"
+                                        th:data-ticket-code="${tk.ticketCode}">
+                                    <i class="bi bi-clipboard me-1"></i>Sao chép mã vé
+                                </button>
+                                <a th:href="@{/tickets/{id}(id=${tk.id})}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-qr-code me-1"></i>Chi tiết &amp; QR
+                                </a>
+                                <a th:href="@{/tickets/{id}/pdf(id=${tk.id})}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i>Tải vé PDF
+                                </a>
+                                <a th:href="@{/tickets/{id}/print(id=${tk.id})}" target="_blank" class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-printer me-1"></i>In vé lên xe
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 text-center h-100">
+                <h6 class="fw-bold mb-2">Mã QR Lên Xe Nhanh</h6>
+                <p class="small text-muted mb-3">Xuất trình mã này cho nhân viên soát vé trước giờ khởi hành 30 phút.</p>
+                <div class="ticket-qr-box mx-auto mb-3" th:utext="${qrSvg}"></div>
+                <div class="small font-monospace text-muted mb-3" th:text="${primaryTicket.qrCodePayload}">BUSBOOKING|VEX</div>
+                <div class="alert alert-info text-start small mb-0 mt-auto">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Chính sách hoàn hủy: Hoàn 90% khi hủy trước 24 giờ, hoàn 70% khi hủy trước từ 4 - 24 giờ.
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_5/checkout.js')}"></div>
+</body>
+</html>

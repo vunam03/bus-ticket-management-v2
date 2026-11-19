@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Chi tiết vé ' + ${ticket.ticketCode})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a th:href="@{/tickets/my-tickets}">Vé của tôi</a></li>
+                    <li class="breadcrumb-item active" th:text="${ticket.ticketCode}">TK-001</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold mb-0">Thẻ Lên Xe Điện Tử (E-Ticket Boarding Pass)</h3>
+        </div>
+        <div class="d-flex gap-2 mt-2 mt-md-0">
+            <a th:href="@{/tickets/{id}/pdf(id=${ticket.id})}" class="btn btn-danger">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i>Tải vé PDF
+            </a>
+            <a th:href="@{/tickets/{id}/print(id=${ticket.id})}" target="_blank" class="btn btn-outline-dark">
+                <i class="bi bi-printer-fill me-1"></i>Bản in vé
+            </a>
+            <a th:href="@{/tickets/my-tickets}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Danh sách vé
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="ticket-boarding-pass">
+                <div class="ticket-boarding-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <span class="badge bg-warning text-dark mb-1" th:text="${ticket.busTrip.busCompany.companyName}">Nhà xe</span>
+                        <h4 class="fw-bold mb-0" th:text="${ticket.busTrip.departureProvince + ' → ' + ticket.busTrip.arrivalProvince}"></h4>
+                    </div>
+                    <div class="text-end">
+                        <div class="small opacity-75">MÃ VÉ ĐIỆN TỬ</div>
+                        <div class="fs-5 fw-bold font-monospace" th:text="${ticket.ticketCode}">TK-123456</div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-8">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Hành khách</div>
+                                    <div class="fw-bold fs-6" th:text="${ticket.passengerName}">Nguyễn Văn A</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Số điện thoại</div>
+                                    <div class="fw-bold fs-6" th:text="${ticket.passengerPhone}">0912345678</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Số ghế / Giường</div>
+                                    <div class="badge bg-primary fs-6 px-3 py-1" th:text="${ticket.seat.seatNumber + ' (Tầng ' + ticket.seat.floorNumber + ')'}">A01</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Biển kiểm soát xe</div>
+                                    <div class="fw-bold" th:text="${ticket.busTrip.licensePlate}">51B-123.45</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Giờ khởi hành</div>
+                                    <div class="fw-bold text-primary" th:text="${#temporals.format(ticket.busTrip.departureTime, 'HH:mm - dd/MM/yyyy')}"></div>
+                                    <div class="small text-secondary" th:text="${ticket.busTrip.departureStation}"></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Dự kiến đến</div>
+                                    <div class="fw-bold text-success" th:text="${#temporals.format(ticket.busTrip.arrivalTime, 'HH:mm - dd/MM/yyyy')}"></div>
+                                    <div class="small text-secondary" th:text="${ticket.busTrip.arrivalStation}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mã QR SVG -->
+                        <div class="col-md-4 text-center border-start-md">
+                            <div class="ticket-qr-box mb-2" th:utext="${qrSvg}"></div>
+                            <div class="small text-muted">Đưa mã QR này cho nhân viên soát vé khi lên xe</div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <span class="text-muted small">Trạng thái vé:</span>
+                            <span class="badge ms-1"
+                                  th:classappend="${ticket.status.name() == 'CONFIRMED' ? 'bg-success' : 'bg-danger'}"
+                                  th:text="${ticket.status.displayName}"></span>
+                            <span class="text-muted small ms-3">Thanh toán:</span>
+                            <span class="badge ms-1"
+                                  th:classappend="${ticket.paymentStatus.name() == 'PAID' ? 'bg-primary' : (ticket.paymentStatus.name() == 'REFUNDED' ? 'bg-info text-dark' : 'bg-warning text-dark')}"
+                                  th:text="${ticket.paymentStatus.displayName}"></span>
+                        </div>
+                        <div>
+                            <span class="text-muted small">Giá thanh toán:</span>
+                            <strong class="fs-5 text-danger ms-1" th:text="${#numbers.formatDecimal(ticket.finalPrice, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung hoàn hủy vé -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-arrow-left-right text-primary me-2"></i>Quản lý &amp; Hoàn hủy vé</h5>
+
+                <div th:if="${ticket.status.name() == 'CONFIRMED'}">
+                    <p class="small text-secondary">
+                        Nếu thay đổi lịch trình, bạn có thể hủy vé trực tuyến trước giờ xe xuất bến. Ghế sẽ được giải phóng ngay sau khi hủy:
+                    </p>
+                    <ul class="small text-muted ps-3 mb-3">
+                        <li>Trước giờ khởi hành &ge; 24 tiếng: Hoàn <strong>90%</strong> tiền vé.</li>
+                        <li>Trước giờ khởi hành &lt; 24 tiếng: Hoàn <strong>70%</strong> tiền vé.</li>
+                    </ul>
+
+                    <form th:action="@{/tickets/{id}/cancel(id=${ticket.id})}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Lý do hủy vé</label>
+                            <input type="text" name="reason" class="form-control form-control-sm" placeholder="VD: Thay đổi kế hoạch công tác..." required>
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger w-100 fw-semibold"
+                                data-confirm="Bạn có chắc chắn muốn hủy vé này và giải phóng ghế?">
+                            <i class="bi bi-x-octagon me-1"></i>Xác nhận Hủy vé
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${ticket.status.name() == 'CANCELLED'}" class="bg-light rounded-3 p-3">
+                    <div class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-octagon-fill me-1"></i>Vé đã hủy</div>
+                    <div class="small mb-1">Thời gian hủy: <strong th:text="${ticket.cancelledAt != null ? #temporals.format(ticket.cancelledAt, 'HH:mm dd/MM/yyyy') : '-'}"></strong></div>
+                    <div class="small mb-1">Lý do hủy: <strong th:text="${ticket.cancellationReason}"></strong></div>
+                    <div class="small" th:if="${ticket.refundAmount != null}">
+                        Số tiền hoàn: <strong class="text-success" th:text="${#numbers.formatDecimal(ticket.refundAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts(null)}"></div>
+</body>
+</html>

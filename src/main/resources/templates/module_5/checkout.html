@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Xác nhận Đặt vé &amp; Thanh toán')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <!-- Banner đếm ngược giữ ghế 10 phút -->
+    <div class="hold-countdown-banner d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-hourglass-split fs-3 text-warning me-3"></i>
+            <div>
+                <div class="fw-bold text-dark">Ghế của bạn đang được giữ tạm thời độc quyền!</div>
+                <div class="small text-secondary">Vui lòng hoàn tất xác nhận thanh toán trước khi hết thời gian giữ chỗ.</div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
+            <div class="text-end">
+                <div class="small text-muted">Thời gian còn lại</div>
+                <div id="holdCountdownTimer" class="fs-4 fw-bold text-danger font-monospace"
+                     th:data-expires-at="${expiresAt}">10:00</div>
+            </div>
+            <form th:action="@{/booking/hold/release/{code}(code=${checkoutForm.holdCode})}" method="post">
+                <input type="hidden" name="tripId" th:value="${trip.id}">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-x-circle me-1"></i>Đổi ghế khác
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <form id="checkoutPaymentForm" th:action="@{/booking/confirm}" th:object="${checkoutForm}" method="post">
+        <input type="hidden" th:field="*{holdCode}">
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <!-- Thông tin hành khách -->
+                <div class="card border-0 shadow-sm p-4 mb-4">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">
+                        <i class="bi bi-person-vcard text-primary me-2"></i>1. Thông tin hành khách đi xe
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Họ và tên hành khách <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{passengerName}" class="form-control" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('passengerName')}" th:errors="*{passengerName}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Số điện thoại nhận vé <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{passengerPhone}" class="form-control" placeholder="0901234567" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('passengerPhone')}" th:errors="*{passengerPhone}"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Email nhận vé điện tử &amp; mã QR <span class="text-danger">*</span></label>
+                            <input type="email" th:field="*{passengerEmail}" class="form-control" required>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('passengerEmail')}" th:errors="*{passengerEmail}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phương thức thanh toán -->
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">
+                        <i class="bi bi-credit-card-2-front text-primary me-2"></i>2. Chọn phương thức thanh toán
+                    </h5>
+
+                    <div class="d-flex flex-column gap-3 mb-3">
+                        <label class="payment-method-card d-flex align-items-center justify-content-between"
+                               th:each="pm : ${paymentMethods}">
+                            <div class="d-flex align-items-center">
+                                <input type="radio" th:field="*{paymentMethod}" th:value="${pm}" class="form-check-input me-3 fs-5">
+                                <div>
+                                    <div class="fw-bold text-dark" th:text="${pm.displayName}">Chuyển khoản</div>
+                                    <div class="small text-muted" th:if="${pm.name() == 'BANK_TRANSFER'}">Xác nhận tự động tức thì qua VietQR 24/7</div>
+                                    <div class="small text-muted" th:if="${pm.name() == 'E_WALLET'}">Thanh toán siêu tốc qua Ví MoMo / ZaloPay / VNPay</div>
+                                    <div class="small text-muted" th:if="${pm.name() == 'CASH'}">Giữ vé và thanh toán tiền mặt trực tiếp tại quầy vé bến xe</div>
+                                </div>
+                            </div>
+                            <i class="bi fs-3 text-primary"
+                               th:classappend="${pm.name() == 'BANK_TRANSFER' ? 'bi-bank' : (pm.name() == 'E_WALLET' ? 'bi-wallet2' : 'bi-cash-coin')}"></i>
+                        </label>
+                    </div>
+
+                    <div id="paymentInstructionBox" class="alert alert-info small mb-3"></div>
+
+                    <div class="form-check bg-light p-3 rounded-3 border">
+                        <input class="form-check-input ms-0 me-2" type="checkbox" th:field="*{simulateFailure}" id="simulateFailureCheck">
+                        <label class="form-check-label small text-secondary" for="simulateFailureCheck">
+                            <strong>[Chế độ Kiểm thử]</strong> Mô phỏng giao dịch thanh toán thất bại (để kiểm tra tính năng lưu lịch sử lỗi và giữ nguyên ghế tạm)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tóm tắt đơn đặt vé -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 90px;">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">
+                        <i class="bi bi-ticket-detailed text-primary me-2"></i>Chi tiết Đơn đặt vé
+                    </h5>
+
+                    <div class="summary-banner-thumb">
+                        <img th:src="@{${trip.destinationImageUrl}}" th:alt="${trip.arrivalProvince}">
+                        <div class="summary-banner-overlay">
+                            <span class="small fw-bold" th:text="${trip.arrivalProvince}">Điểm đến</span>
+                            <span class="text-white-50" style="font-size: 0.74rem;" th:text="${trip.destinationHighlight}">Mô tả điểm đến</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="badge bg-primary mb-2" th:text="${trip.busCompany.companyName}">Nhà xe</span>
+                        <h6 class="fw-bold mb-1" th:text="${trip.departureProvince + ' → ' + trip.arrivalProvince}">Hà Nội -> Đà Nẵng</h6>
+                        <p class="small text-muted mb-2" th:text="${trip.busType.displayName + ' • Biển số: ' + trip.licensePlate}"></p>
+                    </div>
+
+                    <div class="bg-light rounded-3 p-3 mb-3 small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Thời gian khởi hành:</span>
+                            <strong class="text-primary" th:text="${#temporals.format(trip.departureTime, 'HH:mm - dd/MM/yyyy')}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Điểm đón:</span>
+                            <strong th:text="${trip.departureStation}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Điểm trả:</span>
+                            <strong th:text="${trip.arrivalStation}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Mã phiên giữ ghế:</span>
+                            <strong class="font-monospace" th:text="${checkoutForm.holdCode}"></strong>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Danh sách ghế đặt (<span th:text="${#lists.size(seatNumbers)}">1</span> ghế):</span>
+                            <strong class="text-primary" th:text="${#strings.listJoin(seatNumbers, ', ')}">A01, A02</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Đơn giá vé:</span>
+                            <span th:text="${#numbers.formatDecimal(trip.ticketPrice, 0, 'COMMA', 0, 'POINT') + ' đ x ' + #lists.size(seatNumbers)}"></span>
+                        </div>
+                        <div class="d-flex justify-content-between pt-3 border-top align-items-center">
+                            <span class="fw-bold fs-6">Tổng thanh toán:</span>
+                            <strong class="fs-4 text-danger" th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}">350,000 đ</strong>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" id="confirmPaymentBtn" class="btn btn-primary btn-lg fw-bold">
+                            <i class="bi bi-shield-check me-2"></i>Xác nhận Đặt vé &amp; Thanh toán
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_5/checkout.js')}"></div>
+</body>
+</html>
