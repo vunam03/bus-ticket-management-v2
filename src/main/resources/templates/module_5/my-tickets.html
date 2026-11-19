@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Vé của tôi - Lịch sử đặt vé')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-ticket-perforated-fill text-primary me-2"></i>Vé xe của tôi</h3>
+            <p class="text-muted mb-0">Quản lý danh sách vé đã đặt, tải vé PDF, xem mã QR hoặc yêu cầu hủy hoàn tiền</p>
+        </div>
+        <a th:href="@{/trips/search}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>Đặt thêm vé mới
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(tickets)}" class="card border-0 shadow-sm p-5 text-center">
+        <i class="bi bi-ticket-perforated fs-1 text-muted mb-3"></i>
+        <h5 class="fw-bold">Bạn chưa có vé xe nào</h5>
+        <p class="text-muted">Hãy tìm kiếm chuyến xe phù hợp và trải nghiệm đặt vé trực tuyến ngay hôm nay.</p>
+        <div>
+            <a th:href="@{/trips/search}" class="btn btn-primary">Tìm chuyến xe ngay</a>
+        </div>
+    </div>
+
+    <div class="row g-4" th:if="${!#lists.isEmpty(tickets)}">
+        <div class="col-lg-6" th:each="tk : ${tickets}">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                        <span class="small text-muted">Mã vé:</span>
+                        <strong class="font-monospace text-primary ms-1" th:text="${tk.ticketCode}">TK-001</strong>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge"
+                              th:classappend="${tk.status.name() == 'CONFIRMED' ? 'bg-success' : 'bg-danger'}"
+                              th:text="${tk.status.displayName}">Đã xác nhận</span>
+                        <span class="badge"
+                              th:classappend="${tk.paymentStatus.name() == 'PAID' ? 'bg-primary' : (tk.paymentStatus.name() == 'REFUNDED' ? 'bg-info text-dark' : 'bg-warning text-dark')}"
+                              th:text="${tk.paymentStatus.displayName}">Đã thanh toán</span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-light text-dark border mb-1" th:text="${tk.busTrip.busCompany.companyName}">Nhà xe</span>
+                            <h5 class="fw-bold mb-0" th:text="${tk.busTrip.departureProvince + ' → ' + tk.busTrip.arrivalProvince}"></h5>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary-subtle text-primary fs-6 px-3 py-2" th:text="'Ghế ' + ${tk.seat.seatNumber}">Ghế A01</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-light rounded-3 p-3 mb-3 small">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <span class="text-muted d-block">Khởi hành:</span>
+                                <strong th:text="${#temporals.format(tk.busTrip.departureTime, 'HH:mm - dd/MM/yyyy')}"></strong>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block">Bến xuất phát:</span>
+                                <strong th:text="${tk.busTrip.departureStation}"></strong>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block">Hành khách:</span>
+                                <strong th:text="${tk.passengerName + ' (' + tk.passengerPhone + ')'}"></strong>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block">Tổng tiền vé:</span>
+                                <strong class="text-danger" th:text="${#numbers.formatDecimal(tk.finalPrice, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${tk.status.name() == 'CANCELLED' and tk.refundAmount != null and tk.refundAmount > 0}"
+                         class="alert alert-info small py-2 mb-3">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                        Số tiền hoàn trả theo chính sách: <strong th:text="${#numbers.formatDecimal(tk.refundAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top">
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/tickets/{id}(id=${tk.id})}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-qr-code me-1"></i>Chi tiết &amp; QR
+                            </a>
+                            <a th:href="@{/tickets/{id}/pdf(id=${tk.id})}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-file-earmark-pdf me-1"></i>Tải PDF
+                            </a>
+                            <a th:href="@{/tickets/{id}/print(id=${tk.id})}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-printer me-1"></i>In vé
+                            </a>
+                        </div>
+                        <small class="text-muted" th:text="'Đặt lúc: ' + ${#temporals.format(tk.bookingTime, 'HH:mm dd/MM/yyyy')}"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts(null)}"></div>
+</body>
+</html>
