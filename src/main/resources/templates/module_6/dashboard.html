@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/fragments :: head('Dashboard Quản trị &amp; Thống kê Hệ thống')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<div class="container-fluid flex-grow-1">
+    <div class="row">
+        <div class="col-lg-2 px-0">
+            <aside th:replace="~{common/fragments :: adminSidebar('dashboard')}"></aside>
+        </div>
+
+        <main class="col-lg-10 py-4 px-4">
+            <div th:replace="~{common/fragments :: alerts}"></div>
+
+            <!-- Header & Quick Actions -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="badge bg-teal bg-success-subtle text-success border border-success-subtle mb-1">
+                        <i class="bi bi-activity me-1"></i>Dữ liệu thời gian thực từ Database
+                    </span>
+                    <h3 class="fw-bold mb-0">Trung tâm Điều hành &amp; Thống kê Admin</h3>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+                    <a th:href="@{/admin/trips/new}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm Chuyến xe
+                    </a>
+                    <a th:href="@{/admin/reports/revenue}" class="btn btn-primary">
+                        <i class="bi bi-bar-chart-line me-1"></i>Báo cáo Doanh thu
+                    </a>
+                    <a th:href="@{/admin/reports/export(year=${selectedYear})}" class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất Báo cáo Excel
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4 Main KPI Metric Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-metric-card kpi-border-teal h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div class="text-muted small fw-semibold text-uppercase">Tổng Doanh thu Thực thu</div>
+                                <div class="fs-3 fw-bold text-dark mt-1" th:text="${summary.formattedTotalRevenue}">0 đ</div>
+                            </div>
+                            <div class="kpi-icon-badge bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                        </div>
+                        <div class="small text-secondary">
+                            <i class="bi bi-check2-circle text-success me-1"></i>Tính từ <strong th:text="${summary.totalPaidTickets}">0</strong> vé hợp lệ đã thanh toán
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-metric-card kpi-border-blue h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div class="text-muted small fw-semibold text-uppercase">Tổng Chuyến xe Hệ thống</div>
+                                <div class="fs-3 fw-bold text-dark mt-1" th:text="${summary.totalTrips}">0</div>
+                            </div>
+                            <div class="kpi-icon-badge bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-bus-front-fill"></i>
+                            </div>
+                        </div>
+                        <div class="small text-secondary">
+                            Tỷ lệ lấp đầy ghế trung bình: <strong class="text-primary" th:text="${summary.overallOccupancyRate + '%'}">0%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-metric-card kpi-border-amber h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div class="text-muted small fw-semibold text-uppercase">Tổng Vé Đã Bán (Paid)</div>
+                                <div class="fs-3 fw-bold text-dark mt-1" th:text="${summary.totalPaidTickets}">0</div>
+                            </div>
+                            <div class="kpi-icon-badge bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-ticket-perforated-fill"></i>
+                            </div>
+                        </div>
+                        <div class="small text-secondary">
+                            Chờ thu: <strong th:text="${summary.unpaidTicketsCount}">0</strong> • Đã hủy: <strong class="text-danger" th:text="${summary.cancelledTicketsCount}">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-metric-card kpi-border-purple h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div class="text-muted small fw-semibold text-uppercase">Tổng Khách hàng Đăng ký</div>
+                                <div class="fs-3 fw-bold text-dark mt-1" th:text="${summary.totalCustomers}">0</div>
+                            </div>
+                            <div class="kpi-icon-badge bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                        <div class="small">
+                            <a th:href="@{/admin/dashboard/customers}" class="text-decoration-none fw-semibold">
+                                Xem phân tích chi tiêu khách hàng <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1: Monthly Bar Chart + Ticket Status Donut -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-panel-card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Biểu đồ Doanh thu 12 Tháng</h5>
+                                <small class="text-muted">Phân tích doanh thu vé đã thanh toán theo từng tháng trong năm</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="dashboardYearSelect" class="small fw-semibold text-muted mb-0">Năm:</label>
+                                <select id="dashboardYearSelect" class="form-select form-select-sm" style="width: 110px;">
+                                    <option th:each="y : ${availableYears}"
+                                            th:value="${y}"
+                                            th:text="${'Năm ' + y}"
+                                            th:selected="${y == selectedYear}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="monthlyRevenueBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="chart-panel-card h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="fw-bold mb-0"><i class="bi bi-pie-chart-fill text-success me-2"></i>Cơ cấu Trạng thái Vé</h5>
+                            <small class="text-muted">Tỷ trọng vé đã thu tiền, chờ thu tiền và đã hủy</small>
+                        </div>
+                        <div class="chart-canvas-wrapper my-2" style="height: 230px;">
+                            <canvas id="ticketStatusDonutChart"></canvas>
+                        </div>
+                        <div class="row text-center g-2 pt-2 border-top small">
+                            <div class="col-4">
+                                <div class="text-muted">Đã thu tiền</div>
+                                <strong class="text-success fs-6" th:text="${summary.paidTicketsCount}">0</strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted">Chờ thu</div>
+                                <strong class="text-warning fs-6" th:text="${summary.unpaidTicketsCount}">0</strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted">Đã hủy</div>
+                                <strong class="text-danger fs-6" th:text="${summary.cancelledTicketsCount}">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2: 14-Day Daily Revenue Trend + Seat Occupancy Rate by Trip -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="chart-panel-card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Xu hướng Doanh thu 14 Ngày Gần Nhất</h5>
+                                <small class="text-muted">Biến động doanh thu thực tế theo ngày</small>
+                            </div>
+                            <a th:href="@{/admin/reports/revenue}" class="btn btn-sm btn-outline-primary">Lọc tùy chỉnh</a>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="dailyRevenueLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="chart-panel-card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Tỷ lệ Lấp đầy Ghế theo Chuyến</h5>
+                                <small class="text-muted">Tổng: <strong th:text="${summary.bookedSeatsCount}">0</strong>/<strong th:text="${summary.totalSeatsCapacity}">0</strong> ghế đã đặt (<span th:text="${summary.heldSeatsCount}">0</span> đang giữ)</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-3" style="max-height: 310px; overflow-y: auto;">
+                            <div th:each="occ : ${summary.tripOccupancies}" class="p-2 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center small mb-1">
+                                    <div>
+                                        <span class="badge bg-primary me-1" th:text="${occ.tripCode}">TRP</span>
+                                        <strong th:text="${occ.routeName}">Hà Nội → Đà Nẵng</strong>
+                                        <span class="text-muted ms-1" th:text="${'(' + occ.companyName + ')'}"></span>
+                                    </div>
+                                    <span class="fw-bold"
+                                          th:classappend="${occ.occupancyRate >= 70 ? 'text-success' : (occ.occupancyRate >= 35 ? 'text-primary' : 'text-secondary')}"
+                                          th:text="${occ.occupancyRate + '%'}">25%</span>
+                                </div>
+                                <div class="occupancy-progress mb-1">
+                                    <div class="occupancy-progress-bar"
+                                         th:style="'width:' + ${occ.occupancyRate} + '%; background:' + (${occ.occupancyRate >= 70 ? '#10b981' : (occ.occupancyRate >= 35 ? '#2563eb' : '#0f766e')})"></div>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
+                                    <span th:text="${'Khởi hành: ' + #temporals.format(occ.departureTime, 'HH:mm dd/MM/yyyy')}"></span>
+                                    <span>
+                                        Đã đặt: <strong class="text-dark" th:text="${occ.bookedSeats}">0</strong> •
+                                        Giữ: <strong class="text-warning" th:text="${occ.heldSeats}">0</strong> •
+                                        Trống: <strong class="text-success" th:text="${occ.availableSeats}">0</strong>/<span th:text="${occ.totalSeats}">40</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Sales by Bus Company & Sales by Route -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="chart-panel-card h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-building text-primary me-2"></i>Thống kê Vé &amp; Doanh thu theo Nhà xe</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Nhà xe</th>
+                                    <th class="text-center">Vé đã bán</th>
+                                    <th class="text-end">Doanh thu</th>
+                                    <th class="text-end">Tỷ trọng</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="cs : ${summary.companySalesStats}">
+                                    <td class="fw-semibold" th:text="${cs.categoryName}">Phương Trang</td>
+                                    <td class="text-center"><span class="badge bg-primary-subtle text-primary" th:text="${cs.ticketsSold}">0</span></td>
+                                    <td class="text-end fw-bold text-success" th:text="${cs.formattedRevenue}">0 đ</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-light text-dark border" th:text="${cs.sharePercentage + '%'}">0%</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="chart-panel-card h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-signpost-split text-primary me-2"></i>Thống kê Vé &amp; Doanh thu theo Tuyến đường</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Tuyến đường</th>
+                                    <th class="text-center">Vé đã bán</th>
+                                    <th class="text-end">Doanh thu</th>
+                                    <th class="text-end">Tỷ trọng</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="rs : ${summary.routeSalesStats}">
+                                    <td class="fw-semibold" th:text="${rs.categoryName}">Hà Nội → Đà Nẵng</td>
+                                    <td class="text-center"><span class="badge bg-info-subtle text-info-emphasis" th:text="${rs.ticketsSold}">0</span></td>
+                                    <td class="text-end fw-bold text-primary" th:text="${rs.formattedRevenue}">0 đ</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-light text-dark border" th:text="${rs.sharePercentage + '%'}">0%</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Recent Transactions Table -->
+            <div class="chart-panel-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Bảng Giao dịch &amp; Đặt vé Gần nhất</h5>
+                        <small class="text-muted">10 vé phát sinh gần nhất trên hệ thống</small>
+                    </div>
+                    <a th:href="@{/admin/tickets}" class="btn btn-sm btn-outline-primary">Xem toàn bộ vé</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Mã vé</th>
+                            <th>Hành khách</th>
+                            <th>Tuyến đường</th>
+                            <th>Nhà xe</th>
+                            <th>Ghế</th>
+                            <th>Số tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Thời gian đặt</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="tx : ${summary.recentTransactions}">
+                            <td>
+                                <a th:href="@{/tickets/{id}(id=${tx.ticketId})}" class="font-monospace fw-bold text-decoration-none" th:text="${tx.ticketCode}">TK-001</a>
+                            </td>
+                            <td>
+                                <div class="fw-semibold" th:text="${tx.customerName}"></div>
+                                <small class="text-muted" th:text="${tx.customerPhone}"></small>
+                            </td>
+                            <td th:text="${tx.routeName}"></td>
+                            <td th:text="${tx.companyName}"></td>
+                            <td><span class="badge bg-light text-dark border" th:text="${tx.seatNumber}">A01</span></td>
+                            <td class="fw-bold text-danger" th:text="${tx.formattedAmount}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${tx.ticketStatus == 'CONFIRMED' ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${tx.ticketStatus}"></span>
+                                <span class="badge ms-1"
+                                      th:classappend="${tx.paymentStatus == 'PAID' ? 'bg-primary' : 'bg-warning text-dark'}"
+                                      th:text="${tx.paymentStatus}"></span>
+                            </td>
+                            <td class="small text-muted" th:text="${#temporals.format(tx.bookingTime, 'HH:mm dd/MM/yyyy')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/module_6/revenue-chart.js}"></script>
+<script th:src="@{/js/module_6/dashboard.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const monthlyLabels = /*[[${summary.monthlyLabels}]]*/ [];
+        const monthlyRevenues = /*[[${summary.monthlyRevenues}]]*/ [];
+        const selectedYear = /*[[${selectedYear}]]*/ 2026;
+
+        const dailyLabels = /*[[${summary.dailyLabels}]]*/ [];
+        const dailyRevenues = /*[[${summary.dailyRevenues}]]*/ [];
+
+        const paidCount = /*[[${summary.paidTicketsCount}]]*/ 0;
+        const unpaidCount = /*[[${summary.unpaidTicketsCount}]]*/ 0;
+        const cancelledCount = /*[[${summary.cancelledTicketsCount}]]*/ 0;
+
+        RevenueChartHelper.initMonthlyBarChart('monthlyRevenueBarChart', monthlyLabels, monthlyRevenues, selectedYear);
+        RevenueChartHelper.initDailyLineChart('dailyRevenueLineChart', dailyLabels, dailyRevenues);
+        RevenueChartHelper.initTicketStatusDonut('ticketStatusDonutChart', paidCount, unpaidCount, cancelledCount);
+    });
+</script>
+</body>
+</html>
