@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{common/fragments :: head('Đăng ký tài khoản')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="auth-card bg-white" style="max-width: 580px;">
+        <div class="auth-header text-center">
+            <h4 class="fw-bold mb-1"><i class="bi bi-person-plus-fill text-warning me-2"></i>Đăng Ký Thành Viên</h4>
+            <p class="small mb-0 opacity-75">Tạo tài khoản để đặt vé xe khách trực tuyến nhanh chóng</p>
+        </div>
+
+        <div class="p-4">
+            <div th:replace="~{common/fragments :: alerts}"></div>
+
+            <form th:action="@{/auth/register}" th:object="${registerForm}" method="post" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" for="regUsername">Tên đăng nhập <span class="text-danger">*</span></label>
+                    <input type="text" id="regUsername" th:field="*{username}" class="form-control" placeholder="VD: khachhang01" required>
+                    <small id="usernameAvailabilityHint" class="form-text"></small>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{fullName}" class="form-control" placeholder="VD: Nguyễn Văn A" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" for="regEmail">Địa chỉ Email <span class="text-danger">*</span></label>
+                    <input type="email" id="regEmail" th:field="*{email}" class="form-control" placeholder="email@example.com" required>
+                    <small id="emailAvailabilityHint" class="form-text"></small>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{phone}" class="form-control" placeholder="0912345678" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" for="newPassword">Mật khẩu <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="password" id="newPassword" th:field="*{password}" class="form-control password-strength-target"
+                               placeholder="Từ 6 ký tự trở lên" required>
+                        <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="newPassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength-meter mt-2">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <small class="text-muted" id="passwordStrengthLabel">Độ mạnh: Tối thiểu 6 ký tự</small>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" for="confirmPassword">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control"
+                               placeholder="Nhập lại mật khẩu" required>
+                        <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="confirmPassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <small id="confirmMatchHint" class="form-text"></small>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                </div>
+
+                <div class="col-12 pt-2">
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        <i class="bi bi-check2-circle me-1"></i>Hoàn Tất Đăng Ký
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-3 small">
+                Đã có tài khoản? <a th:href="@{/auth/login}" class="fw-bold text-primary text-decoration-none">Đăng nhập tại đây</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_2/auth.js')}"></div>
+</body>
+</html>
