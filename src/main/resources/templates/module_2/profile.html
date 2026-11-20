@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{common/fragments :: head('Thông tin cá nhân')}"></head>
+<body>
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4">
+    <div th:replace="~{common/fragments :: alerts}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-person-badge text-primary me-2"></i>Hồ Sơ Tài Khoản Cá Nhân</h3>
+            <p class="text-muted small mb-0">Cập nhật thông tin liên hệ và quản lý bảo mật mật khẩu</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="btn btn-warning fw-bold">
+                <i class="bi bi-speedometer2 me-1"></i>Vào Trang Quản Trị Admin
+            </a>
+            <a th:href="@{/user/change-password}" class="btn btn-outline-secondary">
+                <i class="bi bi-shield-lock me-1"></i>Bảo mật &amp; Phiên đăng nhập
+            </a>
+            <a th:href="@{/tickets/my-tickets}" class="btn btn-outline-primary">
+                <i class="bi bi-ticket-perforated me-1"></i>Xem Vé Của Tôi
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card-modern p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Thông Tin Liên Hệ</h5>
+                <form th:action="@{/user/profile}" th:object="${profileForm}" method="post" class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tên đăng nhập</label>
+                        <input type="text" class="form-control bg-light" th:value="${userEntity.username}" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Vai trò hệ thống</label>
+                        <input type="text" class="form-control bg-light fw-bold" th:value="${userEntity.role.name.displayName}" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                        <input type="text" th:field="*{fullName}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                        <input type="text" th:field="*{phone}" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                        <input type="email" th:field="*{email}" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Địa chỉ liên hệ</label>
+                        <input type="text" th:field="*{address}" class="form-control" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành phố">
+                    </div>
+                    <div class="col-12 pt-2">
+                        <button type="submit" class="btn btn-success fw-bold px-4">
+                            <i class="bi bi-save me-1"></i>Lưu Thông Tin Cá Nhân
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card-modern p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Đổi Mật Khẩu Bảo Mật</h5>
+                <form th:action="@{/user/change-password}" th:object="${passwordForm}" method="post" class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Mật khẩu hiện tại <span class="text-danger">*</span></label>
+                        <input type="password" th:field="*{currentPassword}" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Mật khẩu mới <span class="text-danger">*</span></label>
+                        <input type="password" th:field="*{newPassword}" class="form-control" placeholder="Tối thiểu 6 ký tự" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+                        <input type="password" th:field="*{confirmPassword}" class="form-control" required>
+                    </div>
+                    <div class="col-12 pt-2">
+                        <button type="submit" class="btn btn-primary fw-bold w-100">
+                            <i class="bi bi-shield-lock me-1"></i>Cập Nhật Mật Khẩu Mới
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+</body>
+</html>

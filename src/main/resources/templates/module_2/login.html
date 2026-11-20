@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{common/fragments :: head('Đăng nhập hệ thống')}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{common/fragments :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="auth-card bg-white">
+        <div class="auth-header text-center">
+            <h4 class="fw-bold mb-1"><i class="bi bi-shield-lock-fill text-warning me-2"></i>Đăng Nhập BusBookingVN</h4>
+            <p class="small mb-0 opacity-75">Hỗ trợ đăng nhập bằng Tên đăng nhập hoặc Email</p>
+        </div>
+
+        <div class="p-4">
+            <div th:replace="~{common/fragments :: alerts}"></div>
+
+            <div th:if="${param.error}" class="alert alert-danger small">
+                <i class="bi bi-exclamation-octagon-fill me-1"></i>Tên đăng nhập/Email hoặc mật khẩu không đúng!
+            </div>
+            <div th:if="${param.logout}" class="alert alert-info small">
+                <i class="bi bi-check-circle-fill me-1"></i>Bạn đã đăng xuất khỏi hệ thống an toàn.
+            </div>
+
+            <form th:action="@{/auth/login}" method="post" class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-semibold" for="username">Tên đăng nhập hoặc Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" id="username" name="username" class="form-control"
+                               placeholder="Nhập admin hoặc email của bạn" required autofocus>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <label class="form-label fw-semibold" for="password">Mật khẩu</label>
+                        <a th:href="@{/auth/forgot-password}" class="small text-decoration-none">Quên mật khẩu?</a>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        <input type="password" id="password" name="password" class="form-control"
+                               placeholder="Nhập mật khẩu" required>
+                        <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="password" title="Hiện/ẩn mật khẩu">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-12 pt-2">
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Đăng Nhập Ngay
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4 small">
+                Chưa có tài khoản? <a th:href="@{/auth/register}" class="fw-bold text-success text-decoration-none">Đăng ký tài khoản mới</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{common/fragments :: footer}"></footer>
+<div th:replace="~{common/fragments :: scripts('/js/module_2/auth.js')}"></div>
+</body>
+</html>

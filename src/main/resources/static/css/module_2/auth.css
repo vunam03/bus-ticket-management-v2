@@ -1,0 +1,73 @@
+/* Module 2: Xac thuc, Phan quyen & Bao mat Tai khoan */
+.auth-card {
+    max-width: 480px;
+    margin: 2.5rem auto;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, #0f172a 0%, #0f766e 100%);
+    color: #ffffff;
+    padding: 1.75rem;
+}
+
+.password-strength-meter {
+    height: 6px;
+    width: 100%;
+    background-color: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.strength-weak {
+    background-color: #ef4444;
+}
+
+.strength-medium {
+    background-color: #f59e0b;
+}
+
+.strength-strong {
+    background-color: #2563eb;
+}
+
+.strength-very-strong {
+    background-color: #10b981;
+}
+
+.user-avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f766e, #0d9488);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.security-session-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
